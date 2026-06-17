@@ -16,4 +16,3 @@ class Individual:
         print(f"Stop loss: {self.stop_loss_ticks} ticks")
         print(f"Min imbalances: {self.min_imbalances}")
         print(f"Fitness : {self.fitness}")
-
