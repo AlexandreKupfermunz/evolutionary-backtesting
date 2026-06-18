@@ -2,20 +2,13 @@ import pandas as pd
 
 def add_basic_features(df):
 
-    add_volume_features(df)
     add_direction_features(df)
     add_impulse_features(df)
     add_time_feature(df)
+    add_imbalance_ratio_features(df)
 
     return df
 
-def add_volume_features(df):
-
-    # This creates a the diagonal imbalance ratio 
-    df["previous_bid"] = df["BidVolume"].shift(1)
-    df["diagonal_imbalance_ratio"] = (df["AskVolume"]/df["previous_bid"])
-
-    return df
 
 def add_direction_features(df):
 
@@ -36,7 +29,6 @@ def add_impulse_features(df):
     consecutive_up = []
     consecutive_down = []
     
-
     for i in range(len(up)):
         if up.iloc[i]:
             consecutive_down_count = 0
@@ -60,10 +52,8 @@ def add_impulse_features(df):
     return df
 
 def add_time_feature(df):
-    
-    df["timestamp"] = pd.to_datetime(
-        df["Date"] + " " + df["Time"]
-    )
+
+    df["timestamp"] = pd.to_datetime(df["Date"] + " " + df["Time"])
     consecutive_up = df["consecutive_up"] 
     consecutive_down = df["consecutive_down"]
     timestamps = df["timestamp"]
@@ -71,6 +61,7 @@ def add_time_feature(df):
     impulse_duration_ms = [] 
 
     for i in range(len(df)):
+
         n_up = consecutive_up.iloc[i]
         n_down = consecutive_down.iloc[i]
 
@@ -88,5 +79,13 @@ def add_time_feature(df):
             impulse_duration_ms.append(None)
 
     df["impulse_duration_ms"] = impulse_duration_ms
+
+    return df
+
+def add_volume_features(df):
+
+    # This creates a the diagonal imbalance ratio 
+    df["previous_bid"] = df["BidVolume"].shift(1)
+    df["diagonal_imbalance_ratio"] = (df["AskVolume"]/df["previous_bid"])
 
     return df
