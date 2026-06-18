@@ -4,5 +4,11 @@ from features import add_basic_features
 df = load_data("data/EURUSD-10D.txt", nrows=100)
 df = add_basic_features(df)
 
-print(df.head())
-print(df[["Last", "consecutive_up", "consecutive_down"]].head())
+print(df[[
+    "Last",
+    "up",
+    "down",
+    "consecutive_up",
+    "consecutive_down",
+    "impulse_duration_ms"
+]].head(60))

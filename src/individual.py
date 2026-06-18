@@ -2,6 +2,7 @@ class Individual:
 
     def __init__(self, impulse_candles, max_duration_ms, take_profit_ticks, 
                  stop_loss_ticks, min_imbalances):
+        
         self.impulse_candles = impulse_candles
         self.max_duration_ms = max_duration_ms
         self.take_profit_ticks = take_profit_ticks
@@ -10,6 +11,7 @@ class Individual:
         self.fitness = 0
 
     def print_parameters(self):
+        
         print(f"Impulse Candles: {self.impulse_candles}")
         print(f"Max duration: {self.max_duration_ms} ms")
         print(f" Take profit: {self.take_profit_ticks} ticks")
