@@ -1,14 +1,15 @@
+import random
 class Individual:
 
-    def __init__(self, impulse_candles, max_duration_ms, take_profit_ticks, 
-                 stop_loss_ticks, diagonal_imbalance_ratio_threshold, min_imbalance_count):
+    def __init__(self, min_impulse_candles, max_duration_ms, diagonal_imbalance_ratio_threshold, min_imbalance_count, take_profit_ticks, 
+                 stop_loss_ticks):
         
-        self.impulse_candles = impulse_candles
+        self.min_impulse_candles = min_impulse_candles
         self.max_duration_ms = max_duration_ms
-        self.take_profit_ticks = take_profit_ticks
-        self.stop_loss_ticks = stop_loss_ticks
         self.diagonal_imbalance_ratio_threshold = diagonal_imbalance_ratio_threshold
         self.min_imbalance_count = min_imbalance_count
+        self.take_profit_ticks = take_profit_ticks
+        self.stop_loss_ticks = stop_loss_ticks
         self.fitness = 0
 
     def print_parameters(self):
@@ -20,3 +21,26 @@ class Individual:
         print(f"Imbalance ratio threshold: {self.diagonal_imbalance_ratio_threshold}")
         print(f"Min numbers of imbalances: {self.min_imbalance_count}")
         print(f"Fitness : {self.fitness}")
+    
+def create_random_individual():
+
+    min_impulse_candles = random.randint(4,15)
+    max_duration_ms = random.randint(200,4000)
+    diagonal_imbalance_ratio_threshold = random.uniform(3.0,10.0)
+    min_imbalance_count = random.randint(1,min_impulse_candles)
+    take_profit_ticks = random.randint(2,30)
+    stop_loss_ticks = random.randint(2,30)
+
+    ind = Individual(min_impulse_candles, max_duration_ms, diagonal_imbalance_ratio_threshold, 
+                     min_imbalance_count, take_profit_ticks, stop_loss_ticks)
+        
+    return ind
+    
+def create_initial_population(population_size):
+        
+    population = []
+
+    for i in range(population_size):
+        population.append(create_random_individual())
+
+    return population

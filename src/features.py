@@ -3,9 +3,9 @@ import pandas as pd
 def add_basic_features(df):
 
     add_direction_features(df)
+    add_volume_features(df)
     add_impulse_features(df)
     add_time_feature(df)
-    add_imbalance_ratio_features(df)
 
     return df
 
@@ -15,6 +15,14 @@ def add_direction_features(df):
     # This return true of false for each direction of the candles
     df["up"] = (df["Last"] > df["Last"].shift(1))
     df["down"] = (df["Last"] < df["Last"].shift(1))
+
+    return df
+
+def add_volume_features(df):
+
+    # This creates a the diagonal imbalance ratio 
+    df["previous_bid"] = df["BidVolume"].shift(1)
+    df["diagonal_imbalance_ratio"] = (df["AskVolume"]/df["previous_bid"])
 
     return df
 
@@ -79,13 +87,5 @@ def add_time_feature(df):
             impulse_duration_ms.append(None)
 
     df["impulse_duration_ms"] = impulse_duration_ms
-
-    return df
-
-def add_volume_features(df):
-
-    # This creates a the diagonal imbalance ratio 
-    df["previous_bid"] = df["BidVolume"].shift(1)
-    df["diagonal_imbalance_ratio"] = (df["AskVolume"]/df["previous_bid"])
 
     return df

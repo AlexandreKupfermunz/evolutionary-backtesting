@@ -1,3 +1,12 @@
+def generate_signals(df, individual):
+    
+    df = add_imbalance_count_feature(df, individual.diagonal_imbalance_ratio_threshold)
+
+    df = generate_long_signal(df, individual.min_impulse_candles, individual.max_duration_ms, individual.min_imbalance_count )
+    df = generate_short_signal(df, individual.min_impulse_candles, individual.max_duration_ms, individual.min_imbalance_count )
+
+    return df
+
 # This part is to count the number of diagonal imbalances within the range of consecutive_up/down
 def add_imbalance_count_feature(df, threshold):
     
@@ -32,7 +41,7 @@ def add_imbalance_count_feature(df, threshold):
 
     return df
 
-def generate_long_signal(df, min_impulse_candles, max_duration_ms, min_imbalance_count,):
+def generate_long_signal(df, min_impulse_candles, max_duration_ms, min_imbalance_count):
 
     consecutive_up = df["consecutive_up"] 
     impulse_duration = df["impulse_duration_ms"]
