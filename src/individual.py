@@ -14,13 +14,13 @@ class Individual:
 
     def print_parameters(self):
 
-        print(f"Impulse Candles: {self.impulse_candles}")
+        print(f"Min impulse Candles: {self.min_impulse_candles}")
         print(f"Max duration: {self.max_duration_ms} ms")
         print(f" Take profit: {self.take_profit_ticks} ticks")
         print(f"Stop loss: {self.stop_loss_ticks} ticks")
         print(f"Imbalance ratio threshold: {self.diagonal_imbalance_ratio_threshold}")
         print(f"Min numbers of imbalances: {self.min_imbalance_count}")
-        print(f"Fitness : {self.fitness}")
+        print(f"Fitness: {self.fitness}")
     
 def create_random_individual():
 

@@ -1,5 +1,5 @@
-from data_loader import load_data
-from features import add_basic_features
+from src.data_loader import load_data
+from src.features import add_basic_features
 
 df = load_data("data/EURUSD-10D.txt", nrows=100)
 df = add_basic_features(df)

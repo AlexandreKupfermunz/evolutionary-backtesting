@@ -1,13 +1,11 @@
-from trade import Trade
+from src.trade import Trade
 
 # TODO : hardcoded slippage for now
 SLIPPAGE_TICKS = 1
 TICK_SIZE = 0.25
 slippage = SLIPPAGE_TICKS*TICK_SIZE 
 
-MAXIMUM_HOLDING_BARS = 200
-
-def backtester(df, individual):
+def backtester(df, individual, maximum_holding_bars):
     
     long_signal = df["long_signal"]
     short_signal = df["short_signal"]
@@ -31,7 +29,7 @@ def backtester(df, individual):
 
             trade_close = False
 
-            for j in range(min(MAXIMUM_HOLDING_BARS, len(df) - i - 1)):
+            for j in range(min(maximum_holding_bars, len(df) - i - 1)):
 
                 if (low.iloc[i+j+1] <= raw_stop_loss_price):
 
@@ -67,7 +65,7 @@ def backtester(df, individual):
 
             if not trade_close:
                 
-                exit_index = min(i + MAXIMUM_HOLDING_BARS, len(df) - 1)
+                exit_index = min(i + maximum_holding_bars, len(df) - 1)
 
                 exit_price = last.iloc[exit_index] 
 
@@ -90,7 +88,7 @@ def backtester(df, individual):
             
             trade_close = False
 
-            for j in range(min(MAXIMUM_HOLDING_BARS, len(df) - i - 1)):
+            for j in range(min(maximum_holding_bars, len(df) - i - 1)):
 
                 if(high.iloc[i+j+1] >= raw_stop_loss_price):
 
@@ -126,7 +124,7 @@ def backtester(df, individual):
 
             if not trade_close:
 
-                exit_index = min(i + MAXIMUM_HOLDING_BARS, len(df) - 1)
+                exit_index = min(i + maximum_holding_bars, len(df) - 1)
                 exit_price = last.iloc[exit_index] 
 
                 result = entry_price - exit_price

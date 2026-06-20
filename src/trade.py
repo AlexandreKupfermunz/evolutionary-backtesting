@@ -10,3 +10,8 @@ class Trade:
         self.entry_timestamp = entry_timestamp
         self.exit_timestamp = exit_timestamp
         self.result = result
+
+def tradePrinter(trades):
+    for i in range(len(trades)):
+        print(f"Trade #{i+1}, entry index: {trades[i].entry_index}, direction: {trades[i].direction}, reason: {trades[i].exit_reason}, result: {trades[i].result}")
+                      

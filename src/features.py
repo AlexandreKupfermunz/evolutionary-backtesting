@@ -20,6 +20,10 @@ def add_direction_features(df):
 
 def add_volume_features(df):
 
+    # This replaces all 0s by 1s
+    df["AskVolume"] = df["AskVolume"].replace(0,1)
+    df["BidVolume"] = df["BidVolume"].replace(0,1)
+    
     # This creates a the diagonal imbalance ratio 
     df["previous_bid"] = df["BidVolume"].shift(1)
     df["diagonal_imbalance_ratio"] = (df["AskVolume"]/df["previous_bid"])

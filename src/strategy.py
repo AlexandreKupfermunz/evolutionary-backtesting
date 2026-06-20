@@ -70,8 +70,9 @@ def generate_short_signal(df, min_impulse_candles, max_duration_ms, min_imbalanc
     short_signal = []
 
     for i in range(len(df)):
-        if (consecutive_down.iloc[i] >= min_impulse_candles and impulse_duration.iloc[i] <= max_duration_ms
-        and short_imbalance_count_in_range.iloc[i] >= min_imbalance_count):
+        if (consecutive_down.iloc[i] >= min_impulse_candles 
+            and impulse_duration.iloc[i] <= max_duration_ms
+            and short_imbalance_count_in_range.iloc[i] >= min_imbalance_count):
             short_signal.append(True)
         else:
             short_signal.append(False)
