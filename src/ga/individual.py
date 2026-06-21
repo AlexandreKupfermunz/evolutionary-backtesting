@@ -1,5 +1,7 @@
 import random
 
+THRESHOLD_RATIO_STEP = 0.25
+
 class Individual:
 
     def __init__(self, min_impulse_candles, max_duration_ms, diagonal_imbalance_ratio_threshold, min_imbalance_count, take_profit_ticks, 
@@ -27,7 +29,8 @@ def create_random_individual():
 
     min_impulse_candles = random.randint(4,15)
     max_duration_ms = random.randint(200,4000)
-    diagonal_imbalance_ratio_threshold = random.uniform(3.0,10.0)
+    # The threshold goes btw 3 and 10 with a step size of 0.25
+    diagonal_imbalance_ratio_threshold = random.randint(12, 40) * THRESHOLD_RATIO_STEP
     min_imbalance_count = random.randint(1,min_impulse_candles)
     take_profit_ticks = random.randint(2,30)
     stop_loss_ticks = random.randint(2,30)
