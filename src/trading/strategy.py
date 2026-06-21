@@ -1,7 +1,6 @@
 def generate_signals(df, individual):
     
     df = add_imbalance_count_feature(df, individual.diagonal_imbalance_ratio_threshold)
-
     df = generate_long_signal(df, individual.min_impulse_candles, individual.max_duration_ms, individual.min_imbalance_count )
     df = generate_short_signal(df, individual.min_impulse_candles, individual.max_duration_ms, individual.min_imbalance_count )
 

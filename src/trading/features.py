@@ -66,6 +66,7 @@ def add_impulse_features(df):
 def add_time_feature(df):
 
     df["timestamp"] = pd.to_datetime(df["Date"] + " " + df["Time"])
+    
     consecutive_up = df["consecutive_up"] 
     consecutive_down = df["consecutive_down"]
     timestamps = df["timestamp"]

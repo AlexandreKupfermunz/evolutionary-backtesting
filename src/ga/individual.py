@@ -1,4 +1,5 @@
 import random
+
 class Individual:
 
     def __init__(self, min_impulse_candles, max_duration_ms, diagonal_imbalance_ratio_threshold, min_imbalance_count, take_profit_ticks, 

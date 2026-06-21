@@ -1,4 +1,4 @@
-from src.trade import Trade
+from src.trading.trade import Trade
 
 # TODO : hardcoded slippage for now
 SLIPPAGE_TICKS = 1

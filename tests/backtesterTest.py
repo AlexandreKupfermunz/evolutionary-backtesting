@@ -1,7 +1,7 @@
-from src.data_loader import load_data
-from src.individual import Individual
-from src.backtester import backtester
-from src.trade import tradePrinter
+from src.trading.data_loader import load_data
+from src.ga.individual import Individual
+from src.trading.backtester import backtester
+from src.trading.trade import tradePrinter
 
 # This is a test data created by AI to test my backtester
 df = load_data("tests/deterministic_50_rows.csv")
