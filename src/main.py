@@ -1,15 +1,21 @@
-import src.trading.data_loader
-import src.trading.features
-import src.ga.individual
+from src.trading.data_loader import load_data
+from src.trading.features import add_basic_features
+from src.ga.individual import create_initial_population
+from src.ga.evolution import make_new_population
 
-df = src.trading.data_loader.load_data("data/NQ-5D.txt", nrows=100)
-df = src.trading.features.add_basic_features(df)
+NUMBERS_OF_GENERATIONS = 10
 
-print(df[[
-    "Last",
-    "up",
-    "down",
-    "consecutive_up",
-    "consecutive_down",
-    "impulse_duration_ms"
-]].head(60))
+df = load_data("data/NQ-5D.txt", nrows=20000)
+df = add_basic_features(df)
+
+population = create_initial_population(10, df)
+
+best = max(population, key=lambda individual: individual.fitness)
+print(best.fitness)
+
+for _ in range(NUMBERS_OF_GENERATIONS):
+
+    population = make_new_population(population, df)
+
+    best = max(population, key=lambda individual: individual.fitness)
+    print(best.fitness)
