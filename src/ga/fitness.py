@@ -1,14 +1,9 @@
-from src.trading.data_loader import load_data
 from src.trading.backtester import backtester
 
 TICK_VALUE = 5
 COMMISSION = 4
 
-df = load_data("tests/deterministic_50_rows.csv")
-
-def setFitness(individual):
-
-    trades = backtester(df, individual, 200)
+def setFitness(individual, trades):
 
     fitness = 0
 
