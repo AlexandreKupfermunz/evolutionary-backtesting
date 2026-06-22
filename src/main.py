@@ -1,8 +1,9 @@
-from src.trading.data_loader import load_data
-from src.trading.features import add_basic_features
+import src.trading.data_loader
+import src.trading.features
+import src.ga.individual
 
-df = load_data("data/EURUSD-10D.txt", nrows=100)
-df = add_basic_features(df)
+df = src.trading.data_loader.load_data("data/NQ-5D.txt", nrows=100)
+df = src.trading.features.add_basic_features(df)
 
 print(df[[
     "Last",
