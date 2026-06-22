@@ -48,3 +48,12 @@ def create_initial_population(population_size):
         population.append(create_random_individual())
 
     return population
+
+def copy(individual):
+    copy = Individual(individual.min_impulse_candles, 
+                                 individual.max_duration_ms, 
+                                 individual.diagonal_imbalance_ratio_threshold, 
+                                 individual.min_imbalance_count, 
+                                 individual.take_profit_ticks, 
+                                 individual.stop_loss_ticks)
+    return copy
