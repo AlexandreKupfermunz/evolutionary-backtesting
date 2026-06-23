@@ -1,6 +1,6 @@
 from src.trading.backtester import backtester
 from src.ga.fitness import setFitness
-from src.trading.strategy import generate_signals
+from strategies.impulse_strategy import generate_signals
 import random
 
 THRESHOLD_RATIO_STEP = 0.25
@@ -22,7 +22,7 @@ class Individual:
 
         print(f"Min impulse Candles: {self.min_impulse_candles}")
         print(f"Max duration: {self.max_duration_ms} ms")
-        print(f" Take profit: {self.take_profit_ticks} ticks")
+        print(f"Take profit: {self.take_profit_ticks} ticks")
         print(f"Stop loss: {self.stop_loss_ticks} ticks")
         print(f"Imbalance ratio threshold: {self.diagonal_imbalance_ratio_threshold}")
         print(f"Min numbers of imbalances: {self.min_imbalance_count}")

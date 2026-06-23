@@ -1,5 +1,4 @@
-data/*
-!data/.gitkeep
+data/NQ-5D.txt*
 
 __pycache__/
 *.pyc
