@@ -1,4 +1,4 @@
-from individual import copy 
+from src.ga.individual import copy 
 import random
 
 def crossover(individual_1, individual_2):

@@ -1,4 +1,5 @@
 from src.trading.backtester import backtester
+from src.trading.strategy import generate_signals
 from src.ga.fitness import setFitness
 from src.ga.selection import selection
 from src.ga.crossover import crossover
@@ -23,6 +24,9 @@ def make_new_population(population, df):
         new_population.append(child)
 
     for individual in new_population:
+
+        df = generate_signals(df, individual)
+        
         trades = backtester(df, individual, 50)
         setFitness(individual, trades)
 

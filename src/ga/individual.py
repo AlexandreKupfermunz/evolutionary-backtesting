@@ -1,5 +1,6 @@
 from src.trading.backtester import backtester
 from src.ga.fitness import setFitness
+from src.trading.strategy import generate_signals
 import random
 
 THRESHOLD_RATIO_STEP = 0.25
@@ -42,7 +43,7 @@ def create_random_individual():
         
     return ind
     
-def create_initial_population(population_size):
+def create_initial_population(population_size, df):
         
     population = []
 
@@ -50,6 +51,7 @@ def create_initial_population(population_size):
         population.append(create_random_individual())
 
     for individual in population:
+        df = generate_signals(df, individual)
         trades = backtester(df, individual, 50)
         setFitness(individual, trades)
 
