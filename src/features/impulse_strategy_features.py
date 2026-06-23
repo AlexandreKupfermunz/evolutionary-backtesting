@@ -1,6 +1,6 @@
 import pandas as pd
 
-def add_impulsion_strategy_features(df):
+def add_impulse_strategy_features(df):
 
     add_direction_features(df)
     add_volume_features(df)
