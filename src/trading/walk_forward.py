@@ -1,9 +1,9 @@
-from data.data_loader import load_data
-from features.impulse_strategy_features import add_impulse_strategy_features
+from src.features.impulse_strategy_features import add_impulse_strategy_features
+from src.strategies.impulse_strategy import generate_signals
 from src.ga.individual import create_initial_population
 from src.ga.evolution import make_new_population
 from src.trading.backtester import backtester
-from src.ga.fitness import setFitness
+from src.ga.fitness import set_fitness
 from src.ga.individual import copy_individual
 
 class WalkForwardWindow:
@@ -13,6 +13,14 @@ class WalkForwardWindow:
         self.train_end = train_end
         self.test_start = test_start
         self.test_end = test_end
+
+class WalkForwardResult:
+
+    def __init__(self, window, best_individual, train_fitness, test_fitness):
+        self.window = window
+        self.best_individual = best_individual
+        self.train_fitness = train_fitness
+        self.test_fitness = test_fitness
 
 def create_walk_forward_windows(df_length, train_size, test_size, step_size):
 
@@ -61,19 +69,15 @@ def run_walk_forward(df, windows, numbers_of_generations, population_size, maxim
             best_individual.print_parameters()
             print("")
         
-        best_individual_copy_for_test = copy(best_individual)
+        best_individual_copy_for_test = copy_individual(best_individual)
+
+        test_df = generate_signals(test_df,best_individual_copy_for_test)
 
         test_trades = backtester(test_df, best_individual_copy_for_test, maximum_holding_bars)
 
-        setFitness(best_individual_copy_for_test, test_trades)
+        set_fitness(best_individual_copy_for_test, test_trades)
 
-
-        results.append({
-            "window": window,
-            "best_trained_individual": best_individual,
-            "best_tested_individual": best_individual_copy_for_test,
-            "train_fitness": best_individual.fitness,
-            "test_fitness": best_individual_copy_for_test.fitness,})
+        results.append(WalkForwardResult(window, best_individual, best_individual.fitness, best_individual_copy_for_test.fitness))
 
         print(f"Best train individual fitness on test data = {best_individual_copy_for_test.fitness}")
     

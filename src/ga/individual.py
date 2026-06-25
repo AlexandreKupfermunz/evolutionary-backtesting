@@ -1,5 +1,5 @@
 from src.trading.backtester import backtester
-from src.ga.fitness import setFitness
+from src.ga.fitness import set_fitness
 from strategies.impulse_strategy import generate_signals
 import random
 
@@ -53,7 +53,7 @@ def create_initial_population(df, population_size, maximum_holding_bars):
     for individual in population:
         df = generate_signals(df, individual)
         trades = backtester(df, individual, maximum_holding_bars)
-        setFitness(individual, trades)
+        set_fitness(individual, trades)
 
     return population
 

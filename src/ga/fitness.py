@@ -3,7 +3,7 @@ from src.trading.backtester import backtester
 TICK_VALUE = 5
 COMMISSION = 4
 
-def setFitness(individual, trades):
+def set_fitness(individual, trades):
 
     fitness = 0
 
