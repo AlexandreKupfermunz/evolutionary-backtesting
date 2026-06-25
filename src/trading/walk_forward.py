@@ -3,7 +3,7 @@ from src.strategies.impulse_strategy import generate_signals
 from src.ga.individual import create_initial_population
 from src.ga.evolution import make_new_population
 from src.trading.backtester import backtester
-from src.ga.fitness import set_fitness
+from fitness.basic_profit_fitness import basic_profit_set_fitness 
 from src.ga.individual import copy_individual
 
 class WalkForwardWindow:
@@ -75,7 +75,7 @@ def run_walk_forward(df, windows, numbers_of_generations, population_size, maxim
 
         test_trades = backtester(test_df, best_individual_copy_for_test, maximum_holding_bars)
 
-        set_fitness(best_individual_copy_for_test, test_trades)
+        basic_profit_set_fitness(best_individual_copy_for_test, test_trades)
 
         results.append(WalkForwardResult(window, best_individual, best_individual.fitness, best_individual_copy_for_test.fitness))
 

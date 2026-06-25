@@ -1,9 +1,4 @@
-from src.trading.backtester import backtester
-
-TICK_VALUE = 5
-COMMISSION = 4
-
-def set_fitness(individual, trades):
+def drawdown_fitness(individual, trades):
 
     fitness = 0
 
