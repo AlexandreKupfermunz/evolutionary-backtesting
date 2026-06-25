@@ -1,6 +1,6 @@
 from src.trading.backtester import backtester
 from src.ga.fitness import set_fitness
-from strategies.impulse_strategy import generate_signals
+from src.strategies.impulse_strategy import generate_signals
 import random
 
 THRESHOLD_RATIO_STEP = 0.25

@@ -1,5 +1,5 @@
 from src.trading.backtester import backtester
-from strategies.impulse_strategy import generate_signals
+from src.strategies.impulse_strategy import generate_signals
 from src.ga.fitness import set_fitness
 from src.ga.selection import selection
 from src.ga.crossover import crossover

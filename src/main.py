@@ -1,27 +1,8 @@
 from data.data_loader import load_data
-from features.impulse_strategy_features import add_impulse_strategy_features
-from src.ga.individual import create_initial_population
-from src.ga.evolution import make_new_population
+from src.trading.walk_forward import create_walk_forward_windows
+from src.trading.walk_forward import run_walk_forward
 
-NUMBERS_OF_GENERATIONS = 2
 
-df = load_data("data/NQ-5D.txt", 20000)
-df = add_impulse_strategy_features(df)
-
-population = create_initial_population(10, df)
-
-best = max(population, key=lambda individual: individual.fitness)
-
-print(f"Generation #0")
-best.print_parameters()
-print("")
-
-for i in range(NUMBERS_OF_GENERATIONS):
-
-    population = make_new_population(population, df)
-
-    best = max(population, key=lambda individual: individual.fitness)
-
-    print(f"Generation #{i+1}")
-    best.print_parameters()
-    print("")
+df = load_data("data/NQ-5D.txt", 50000)
+windows = create_walk_forward_windows(len(df), 20000, 10000, 10000)
+results = run_walk_forward(df, windows, 10, 20, 200)
