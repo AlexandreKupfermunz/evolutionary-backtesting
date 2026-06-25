@@ -16,4 +16,3 @@ def setFitness(individual, trades):
     individual.fitness = fitness
 
     return fitness
-

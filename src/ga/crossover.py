@@ -1,9 +1,9 @@
-from src.ga.individual import copy 
+from src.ga.individual import copy_individual
 import random
 
 def crossover(individual_1, individual_2):
 
-    child = copy(individual_1)
+    child = copy_individual(individual_1)
 
     random_number = random.random()
 

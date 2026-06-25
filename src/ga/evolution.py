@@ -5,7 +5,7 @@ from src.ga.selection import selection
 from src.ga.crossover import crossover
 from src.ga.mutation import mutation
 
-def make_new_population(population, df):
+def make_new_population(df, population, maximum_holding_bars):
 
     new_population = []
 
@@ -27,7 +27,7 @@ def make_new_population(population, df):
 
         df = generate_signals(df, individual)
         
-        trades = backtester(df, individual, 50)
+        trades = backtester(df, individual, maximum_holding_bars)
         setFitness(individual, trades)
 
     return new_population

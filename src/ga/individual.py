@@ -43,7 +43,7 @@ def create_random_individual():
         
     return ind
     
-def create_initial_population(population_size, df):
+def create_initial_population(df, population_size, maximum_holding_bars):
         
     population = []
 
@@ -52,12 +52,12 @@ def create_initial_population(population_size, df):
 
     for individual in population:
         df = generate_signals(df, individual)
-        trades = backtester(df, individual, 50)
+        trades = backtester(df, individual, maximum_holding_bars)
         setFitness(individual, trades)
 
     return population
 
-def copy(individual):
+def copy_individual(individual):
     copy = Individual(individual.min_impulse_candles, 
                                  individual.max_duration_ms, 
                                  individual.diagonal_imbalance_ratio_threshold, 
