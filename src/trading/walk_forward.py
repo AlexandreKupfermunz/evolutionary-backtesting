@@ -4,6 +4,7 @@ from src.ga.individual import create_initial_population
 from src.ga.evolution import make_new_population
 from src.trading.backtester import backtester
 from src.ga.individual import copy_individual
+from src.fitness.metrics import net_profit
 
 class WalkForwardWindow:
 
@@ -54,18 +55,30 @@ def run_walk_forward(df, windows, number_of_generations, population_size, fitnes
 
         best_individual = max(population, key=lambda individual: individual.fitness)
 
+        train_signal_df = generate_signals(train_df.copy(), best_individual)
+
+        original_trades = backtester(train_signal_df,best_individual, maximum_holding_bars)
+
         print(f"Generation #0")
         best_individual.print_parameters()
+        print(f"Number of trades: {len(original_trades)}")
+        print(f"Profit: {net_profit(original_trades, tick_value, commission)}")
         print("")
 
         for i in range(number_of_generations):
 
-            population = make_new_population(train_df, population, fitness_function, maximum_holding_bars, tick_value, commission)
+            population = make_new_population(train_df, population, fitness_function, tick_value, commission, maximum_holding_bars)
 
             best_individual = max(population, key=lambda individual: individual.fitness)
 
+            train_signal_df = generate_signals(train_df.copy(), best_individual)
+
+            train_trades = backtester(train_signal_df, best_individual, maximum_holding_bars)
+
             print(f"Generation #{i+1}")
             best_individual.print_parameters()
+            print(f"Number of trades: {len(train_trades)}")
+            print(f"Profit: {net_profit(train_trades, tick_value, commission)}")
             print("")
         
         best_individual_copy_for_test = copy_individual(best_individual)
@@ -80,7 +93,10 @@ def run_walk_forward(df, windows, number_of_generations, population_size, fitnes
 
         results.append(WalkForwardResult(window, best_individual, best_individual.fitness, best_individual_copy_for_test.fitness))
 
-        print(f"Best train individual fitness on test data = {best_individual_copy_for_test.fitness}")
-        
+        print(f"Best trained individual on test data:")
+        best_individual_copy_for_test.print_parameters()
+        print(f"Number of trades: {len(test_trades)}")
+        print(f"Profit: {net_profit(test_trades, tick_value, commission)}")
+        print("")
     
     return results

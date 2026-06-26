@@ -50,8 +50,8 @@ def create_initial_population(df, population_size, fitness_function, tick_value,
         population.append(create_random_individual())
 
     for individual in population:
-        df = generate_signals(df, individual)
-        trades = backtester(df, individual, maximum_holding_bars)
+        signal_df = generate_signals(df.copy(), individual)
+        trades = backtester(signal_df, individual, maximum_holding_bars)
         fitness = fitness_function(trades, tick_value, commission)
         individual.fitness = fitness
 

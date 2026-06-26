@@ -17,7 +17,7 @@ def basic_profit_fitness(trades, tick_value, commission):
     numbers_of_trades = len(trades)
 
     if numbers_of_trades < 10:
-        return 0
+        return -1000
 
     fitness = net_profit_value
 
@@ -29,7 +29,7 @@ def profit_trade_fitness(trades, tick_value, commission):
     numbers_of_trades = len(trades)
 
     if numbers_of_trades < 10:
-        return 0
+        return -1000
 
     fitness = net_profit_value* math.sqrt(numbers_of_trades)
 
@@ -42,7 +42,7 @@ def basic_drawdown_fitness(trades, tick_value, commission):
     numbers_of_trades = len(trades)
 
     if numbers_of_trades < 10:
-        return 0
+        return -1000
 
     fitness = (net_profit_value)/(1+max_drawdown_value)
 
@@ -55,7 +55,7 @@ def drawdown_trade_fitness(trades, tick_value, commission):
     numbers_of_trades = len(trades)
 
     if numbers_of_trades < 10:
-        return 0
+        return -1000
 
     fitness = (net_profit_value*math.sqrt(numbers_of_trades))/(1+max_drawdown_value)
 
