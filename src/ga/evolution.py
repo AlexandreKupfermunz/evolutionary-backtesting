@@ -1,11 +1,10 @@
 from src.trading.backtester import backtester
 from src.strategies.impulse_strategy import generate_signals
-from fitness.basic_profit_fitness import basic_profit_set_fitness 
 from src.ga.selection import selection
 from src.ga.crossover import crossover
 from src.ga.mutation import mutation
 
-def make_new_population(df, population, maximum_holding_bars):
+def make_new_population(df, population, fitness_function, tick_value, commission, maximum_holding_bars,):
 
     new_population = []
 
@@ -28,6 +27,9 @@ def make_new_population(df, population, maximum_holding_bars):
         df = generate_signals(df, individual)
         
         trades = backtester(df, individual, maximum_holding_bars)
-        basic_profit_set_fitness (individual, trades)
+
+        fitness = fitness_function(trades, tick_value, commission)
+
+        individual.fitness = fitness
 
     return new_population

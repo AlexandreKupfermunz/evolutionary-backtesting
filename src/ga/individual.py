@@ -1,5 +1,4 @@
 from src.trading.backtester import backtester
-from fitness.basic_profit_fitness import basic_profit_set_fitness 
 from src.strategies.impulse_strategy import generate_signals
 import random
 
@@ -43,7 +42,7 @@ def create_random_individual():
         
     return ind
     
-def create_initial_population(df, population_size, maximum_holding_bars):
+def create_initial_population(df, population_size, fitness_function, tick_value, commission, maximum_holding_bars):
         
     population = []
 
@@ -53,7 +52,8 @@ def create_initial_population(df, population_size, maximum_holding_bars):
     for individual in population:
         df = generate_signals(df, individual)
         trades = backtester(df, individual, maximum_holding_bars)
-        basic_profit_set_fitness(individual, trades)
+        fitness = fitness_function(trades, tick_value, commission)
+        individual.fitness = fitness
 
     return population
 

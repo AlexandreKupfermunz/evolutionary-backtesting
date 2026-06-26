@@ -33,7 +33,7 @@ def gross_loss(trades, tick_value, commission):
 
     return total_loss
 
-def losing_streak(trades, tick_value, commission):
+def biggest_losing_streak(trades, tick_value, commission):
 
     losing_count = 0 
     max_losing_count = 0

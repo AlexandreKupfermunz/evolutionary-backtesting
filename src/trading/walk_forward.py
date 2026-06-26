@@ -3,7 +3,6 @@ from src.strategies.impulse_strategy import generate_signals
 from src.ga.individual import create_initial_population
 from src.ga.evolution import make_new_population
 from src.trading.backtester import backtester
-from fitness.basic_profit_fitness import basic_profit_set_fitness 
 from src.ga.individual import copy_individual
 
 class WalkForwardWindow:
@@ -39,7 +38,7 @@ def create_walk_forward_windows(df_length, train_size, test_size, step_size):
 
     return windows 
 
-def run_walk_forward(df, windows, numbers_of_generations, population_size, maximum_holding_bars):
+def run_walk_forward(df, windows, number_of_generations, population_size, fitness_function, tick_value, commission, maximum_holding_bars):
 
     results = []
 
@@ -51,7 +50,7 @@ def run_walk_forward(df, windows, numbers_of_generations, population_size, maxim
         train_df = add_impulse_strategy_features(train_df)
         test_df = add_impulse_strategy_features(test_df)
 
-        population = create_initial_population(train_df, population_size, maximum_holding_bars)
+        population = create_initial_population(train_df, population_size, fitness_function, tick_value, commission, maximum_holding_bars)
 
         best_individual = max(population, key=lambda individual: individual.fitness)
 
@@ -59,9 +58,9 @@ def run_walk_forward(df, windows, numbers_of_generations, population_size, maxim
         best_individual.print_parameters()
         print("")
 
-        for i in range(numbers_of_generations):
+        for i in range(number_of_generations):
 
-            population = make_new_population(train_df, population, maximum_holding_bars)
+            population = make_new_population(train_df, population, fitness_function, maximum_holding_bars, tick_value, commission)
 
             best_individual = max(population, key=lambda individual: individual.fitness)
 
@@ -75,10 +74,13 @@ def run_walk_forward(df, windows, numbers_of_generations, population_size, maxim
 
         test_trades = backtester(test_df, best_individual_copy_for_test, maximum_holding_bars)
 
-        basic_profit_set_fitness(best_individual_copy_for_test, test_trades)
+        test_fitness = fitness_function(test_trades, tick_value, commission)
+
+        best_individual_copy_for_test.fitness = test_fitness
 
         results.append(WalkForwardResult(window, best_individual, best_individual.fitness, best_individual_copy_for_test.fitness))
 
         print(f"Best train individual fitness on test data = {best_individual_copy_for_test.fitness}")
+        
     
     return results
