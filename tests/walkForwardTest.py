@@ -11,4 +11,4 @@ from src.fitness.fitness_functions import complex_fitness
 
 df = load_data("data/NQ-Sample_Data.txt", 5000)
 windows = create_walk_forward_windows(len(df), 2000, 1000, 1000)
-results = run_walk_forward(df, windows, 10, 20, basic_profit_fitness, 5, 4, 200)
+results = run_walk_forward(df, windows, 10, 20, basic_profit_fitness, 5, 4, 200, 5)

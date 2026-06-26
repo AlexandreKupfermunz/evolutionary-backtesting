@@ -39,7 +39,7 @@ def create_walk_forward_windows(df_length, train_size, test_size, step_size):
 
     return windows 
 
-def run_walk_forward(df, windows, number_of_generations, population_size, fitness_function, tick_value, commission, maximum_holding_bars):
+def run_walk_forward(df, windows, number_of_generations, population_size, fitness_function, tick_value, commission, maximum_holding_bars, patience):
 
     results = []
 
@@ -53,35 +53,56 @@ def run_walk_forward(df, windows, number_of_generations, population_size, fitnes
 
         population = create_initial_population(train_df, population_size, fitness_function, tick_value, commission, maximum_holding_bars)
 
-        best_individual = max(population, key=lambda individual: individual.fitness)
+        current_best_individual = max(population, key=lambda individual: individual.fitness)
 
-        train_signal_df = generate_signals(train_df.copy(), best_individual)
+        train_signal_df = generate_signals(train_df.copy(), current_best_individual)
 
-        original_trades = backtester(train_signal_df,best_individual, maximum_holding_bars)
+        original_trades = backtester(train_signal_df, current_best_individual, maximum_holding_bars)
 
         print(f"Generation #0")
-        best_individual.print_parameters()
+        current_best_individual.print_parameters()
         print(f"Number of trades: {len(original_trades)}")
         print(f"Profit: {net_profit(original_trades, tick_value, commission)}")
         print("")
+
+        generations_without_improvement = 0
+        best_fitness = current_best_individual.fitness
+        last_best_individual = current_best_individual
 
         for i in range(number_of_generations):
 
             population = make_new_population(train_df, population, fitness_function, tick_value, commission, maximum_holding_bars)
 
-            best_individual = max(population, key=lambda individual: individual.fitness)
+            current_best_individual = max(population, key=lambda individual: individual.fitness)
 
-            train_signal_df = generate_signals(train_df.copy(), best_individual)
+            train_signal_df = generate_signals(train_df.copy(), current_best_individual)
 
-            train_trades = backtester(train_signal_df, best_individual, maximum_holding_bars)
+            train_trades = backtester(train_signal_df, current_best_individual, maximum_holding_bars)
+
+            if current_best_individual.fitness > best_fitness:
+                best_fitness = current_best_individual.fitness
+                generations_without_improvement = 0
+                last_best_individual = current_best_individual
+            else:
+                generations_without_improvement += 1
+
+            if generations_without_improvement >= patience:
+
+                print(f"Early stopping at generation #{i+1}")
+                last_best_individual.print_parameters()
+                print(f"Number of trades: {len(train_trades)}")
+                print(f"Profit: {net_profit(train_trades, tick_value, commission)}")
+                print("")
+                
+                break
 
             print(f"Generation #{i+1}")
-            best_individual.print_parameters()
+            current_best_individual.print_parameters()
             print(f"Number of trades: {len(train_trades)}")
             print(f"Profit: {net_profit(train_trades, tick_value, commission)}")
             print("")
         
-        best_individual_copy_for_test = copy_individual(best_individual)
+        best_individual_copy_for_test = copy_individual(last_best_individual)
 
         test_df = generate_signals(test_df,best_individual_copy_for_test)
 
@@ -91,7 +112,7 @@ def run_walk_forward(df, windows, number_of_generations, population_size, fitnes
 
         best_individual_copy_for_test.fitness = test_fitness
 
-        results.append(WalkForwardResult(window, best_individual, best_individual.fitness, best_individual_copy_for_test.fitness))
+        results.append(WalkForwardResult(window, last_best_individual, last_best_individual.fitness, best_individual_copy_for_test.fitness))
 
         print(f"Best trained individual on test data:")
         best_individual_copy_for_test.print_parameters()
