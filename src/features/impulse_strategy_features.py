@@ -1,14 +1,18 @@
 import pandas as pd
 
+MIN_IMBALANCE_RATIO = 3.0
+MAX_IMBALANCE_RATIO = 10.0
+THRESHOLD_RATIO_STEP = 0.25
+
 def add_impulse_strategy_features(df):
 
     add_direction_features(df)
     add_volume_features(df)
     add_impulse_features(df)
     add_time_feature(df)
+    precompute_imbalance_thresholds(df)
 
     return df
-
 
 def add_direction_features(df):
 
@@ -94,3 +98,22 @@ def add_time_feature(df):
     df["impulse_duration_ms"] = impulse_duration_ms
 
     return df
+
+def precompute_imbalance_thresholds(df):
+    
+    start = int(MIN_IMBALANCE_RATIO / THRESHOLD_RATIO_STEP)
+    end = int(MAX_IMBALANCE_RATIO / THRESHOLD_RATIO_STEP)
+
+    all_thresholds = []
+
+    for i in range(start, end+1):
+        all_thresholds.append(round(i * THRESHOLD_RATIO_STEP, 2))
+
+    for threshold in all_thresholds:
+        df[f"is_imbalance_ratio_long_{format_threshold_for_column(threshold)}"] = df["diagonal_imbalance_ratio"] > threshold
+        df[f"is_imbalance_ratio_short_{format_threshold_for_column(threshold)}"] = df["diagonal_imbalance_ratio"] < 1/threshold
+
+    return df
+
+def format_threshold_for_column(threshold):
+    return str(threshold).replace(".", "_")
