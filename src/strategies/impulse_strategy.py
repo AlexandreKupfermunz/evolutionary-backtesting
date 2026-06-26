@@ -1,3 +1,5 @@
+from src.features.impulse_strategy_features import format_threshold_for_column
+
 def generate_signals(df, individual):
     
     df = add_imbalance_count_feature(df, individual.diagonal_imbalance_ratio_threshold)
@@ -9,9 +11,13 @@ def generate_signals(df, individual):
 # This part is to count the number of diagonal imbalances within the range of consecutive_up/down
 def add_imbalance_count_feature(df, threshold):
     
+    threshold_name = format_threshold_for_column(threshold)
+
+    long_imbalance = df[f"is_imbalance_ratio_long_{threshold_name}"]
+    short_imbalance = df[f"is_imbalance_ratio_short_{threshold_name}"]
+
     consecutive_up = df["consecutive_up"]
     consecutive_down = df["consecutive_down"]
-    imbalance_ratio = df["diagonal_imbalance_ratio"]
 
     buy_imbalance_count_in_range = []
     sell_imbalance_count_in_range = []
@@ -22,15 +28,13 @@ def add_imbalance_count_feature(df, threshold):
         sell_imbalance_count = 0
         
         for j in range(int(consecutive_up.iloc[i])):
-            
-            if imbalance_ratio.iloc[i-j] > threshold:
+            if long_imbalance.iloc[i - j]:
                 buy_imbalance_count += 1
             
         buy_imbalance_count_in_range.append(buy_imbalance_count)
         
         for j in range(int(consecutive_down.iloc[i])):
-            
-            if imbalance_ratio.iloc[i-j] < 1/threshold:
+            if short_imbalance.iloc[i - j]:
                 sell_imbalance_count += 1
             
         sell_imbalance_count_in_range.append(sell_imbalance_count)
