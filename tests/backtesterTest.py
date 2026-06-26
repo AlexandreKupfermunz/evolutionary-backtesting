@@ -4,7 +4,7 @@ from src.trading.backtester import backtester
 from src.trading.trade import tradePrinter
 
 # This is a test data created by AI to test my backtester
-df = load_data("tests/deterministic_50_rows.csv")
+df = load_data("data/deterministic_50_rows.csv")
 
 individual = Individual(
     min_impulse_candles=3,
