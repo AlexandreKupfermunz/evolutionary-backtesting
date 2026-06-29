@@ -40,6 +40,7 @@ class GenerationResult:
 
     def __init__(
         self,
+        dataset_type,
         window,
         generation,
         best_individual,
@@ -56,6 +57,7 @@ class GenerationResult:
         biggest_losing_streak,
         patience_counter,
     ):
+        self.dataset_type = dataset_type
         self.window = window
         self.generation = generation
         self.best_individual = best_individual
@@ -128,31 +130,59 @@ def run_walk_forward(df, windows, number_of_generations, population_size, fitnes
         current_best_individual = max(population, key=lambda individual: individual.fitness)
 
         train_signal_df = generate_signals(train_df.copy(), current_best_individual)
+        original_train_trades = backtester(train_signal_df, current_best_individual, maximum_holding_bars)
 
-        original_trades = backtester(train_signal_df, current_best_individual, maximum_holding_bars)
+        test_signal_df = generate_signals(test_df.copy(), current_best_individual)
+        original_test_trades = backtester(test_signal_df, current_best_individual, maximum_holding_bars)
+        original_test_fitness = fitness_function(original_test_trades, tick_value, commission)
 
         generation_results.append(GenerationResult(
+                                        dataset_type="train",
                                         window=window,
                                         generation=0,
                                         best_individual=current_best_individual,
                                         fitness=current_best_individual.fitness,
-                                        number_of_trades=len(original_trades),
-                                        net_profit=net_profit(original_trades, tick_value, commission),
-                                        gross_profit=gross_profit(original_trades, tick_value, commission),
-                                        gross_loss=gross_loss(original_trades, tick_value, commission),
-                                        profit_factor=profit_factor(original_trades, tick_value, commission),
-                                        max_drawdown=max_drawdown(original_trades, tick_value, commission),
-                                        win_rate=win_rate(original_trades, tick_value, commission),
-                                        average_trade=average_trade(original_trades, tick_value, commission),
-                                        biggest_loss=biggest_loss(original_trades, tick_value, commission),
-                                        biggest_losing_streak=biggest_losing_streak(original_trades, tick_value, commission),
+                                        number_of_trades=len(original_train_trades),
+                                        net_profit=net_profit(original_train_trades, tick_value, commission),
+                                        gross_profit=gross_profit(original_train_trades, tick_value, commission),
+                                        gross_loss=gross_loss(original_train_trades, tick_value, commission),
+                                        profit_factor=profit_factor(original_train_trades, tick_value, commission),
+                                        max_drawdown=max_drawdown(original_train_trades, tick_value, commission),
+                                        win_rate=win_rate(original_train_trades, tick_value, commission),
+                                        average_trade=average_trade(original_train_trades, tick_value, commission),
+                                        biggest_loss=biggest_loss(original_train_trades, tick_value, commission),
+                                        biggest_losing_streak=biggest_losing_streak(original_train_trades, tick_value, commission),
+                                        patience_counter=0
+                                    ))
+        
+        generation_results.append(GenerationResult(
+                                        dataset_type="test",
+                                        window=window,
+                                        generation=0,
+                                        best_individual=current_best_individual,
+                                        fitness=original_test_fitness,
+                                        number_of_trades=len(original_test_trades),
+                                        net_profit=net_profit(original_test_trades, tick_value, commission),
+                                        gross_profit=gross_profit(original_test_trades, tick_value, commission),
+                                        gross_loss=gross_loss(original_test_trades, tick_value, commission),
+                                        profit_factor=profit_factor(original_test_trades, tick_value, commission),
+                                        max_drawdown=max_drawdown(original_test_trades, tick_value, commission),
+                                        win_rate=win_rate(original_test_trades, tick_value, commission),
+                                        average_trade=average_trade(original_test_trades, tick_value, commission),
+                                        biggest_loss=biggest_loss(original_test_trades, tick_value, commission),
+                                        biggest_losing_streak=biggest_losing_streak(original_test_trades, tick_value, commission),
                                         patience_counter=0
                                     ))
 
         print(f"Generation #0")
         current_best_individual.print_parameters()
-        print(f"Number of trades: {len(original_trades)}")
-        print(f"Profit: {net_profit(original_trades, tick_value, commission)}")
+        print(f"Number of trades: {len(original_train_trades)}")
+        print(f"Profit: {net_profit(original_train_trades, tick_value, commission)}")
+        print("")
+
+        print(f"Current test results")
+        print(f"Number of trades: {len(original_test_trades)}")
+        print(f"Profit: {net_profit(original_test_trades, tick_value, commission)}")
         print("")
 
         generations_without_improvement = 0
@@ -175,7 +205,12 @@ def run_walk_forward(df, windows, number_of_generations, population_size, fitnes
             best_train_signal_df = generate_signals(train_df.copy(), best_individual_so_far)
             best_train_trades = backtester(best_train_signal_df, best_individual_so_far, maximum_holding_bars)
 
+            best_test_signal_df = generate_signals(test_df.copy(), best_individual_so_far)
+            best_trained_test_trades = backtester(best_test_signal_df, best_individual_so_far, maximum_holding_bars)
+            test_fitness = fitness_function(best_trained_test_trades, tick_value, commission)
+
             generation_results.append(GenerationResult(
+                                        dataset_type="train",
                                         window=window,
                                         generation=i,
                                         best_individual=best_individual_so_far,
@@ -191,6 +226,25 @@ def run_walk_forward(df, windows, number_of_generations, population_size, fitnes
                                         biggest_loss=biggest_loss(best_train_trades, tick_value, commission),
                                         biggest_losing_streak=biggest_losing_streak(best_train_trades, tick_value, commission),
                                         patience_counter=generations_without_improvement,
+                                    ))
+            
+            generation_results.append(GenerationResult(
+                                        dataset_type="test",
+                                        window=window,
+                                        generation=i,
+                                        best_individual=best_individual_so_far,
+                                        fitness=test_fitness,
+                                        number_of_trades=len(best_trained_test_trades),
+                                        net_profit=net_profit(best_trained_test_trades, tick_value, commission),
+                                        gross_profit=gross_profit(best_trained_test_trades, tick_value, commission),
+                                        gross_loss=gross_loss(best_trained_test_trades, tick_value, commission),
+                                        profit_factor=profit_factor(best_trained_test_trades, tick_value, commission),
+                                        max_drawdown=max_drawdown(best_trained_test_trades, tick_value, commission),
+                                        win_rate=win_rate(best_trained_test_trades, tick_value, commission),
+                                        average_trade=average_trade(best_trained_test_trades, tick_value, commission),
+                                        biggest_loss=biggest_loss(best_trained_test_trades, tick_value, commission),
+                                        biggest_losing_streak=biggest_losing_streak(best_trained_test_trades, tick_value, commission),
+                                        patience_counter=generations_without_improvement
                                     ))
 
             if generations_without_improvement >= patience:
