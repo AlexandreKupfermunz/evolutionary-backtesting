@@ -254,11 +254,21 @@ def run_walk_forward(df, windows, number_of_generations, population_size, fitnes
                 print(f"Number of trades: {len(best_train_trades)}")
                 print(f"Profit: {net_profit(best_train_trades, tick_value, commission)}")
                 print("")
+
+                print(f"Current test results")
+                print(f"Number of trades: {len(best_train_trades)}")
+                print(f"Profit: {net_profit(best_train_trades, tick_value, commission)}")
+                print("")
                 
                 break
 
             print(f"Generation #{i}")
             best_individual_so_far.print_parameters()
+            print(f"Number of trades: {len(best_train_trades)}")
+            print(f"Profit: {net_profit(best_train_trades, tick_value, commission)}")
+            print("")
+
+            print(f"Current test results")
             print(f"Number of trades: {len(best_train_trades)}")
             print(f"Profit: {net_profit(best_train_trades, tick_value, commission)}")
             print("")

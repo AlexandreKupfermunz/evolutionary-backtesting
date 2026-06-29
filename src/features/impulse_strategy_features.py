@@ -116,4 +116,5 @@ def precompute_imbalance_thresholds(df):
     return df
 
 def format_threshold_for_column(threshold):
+    threshold = round(float(threshold), 2)
     return str(threshold).replace(".", "_")
