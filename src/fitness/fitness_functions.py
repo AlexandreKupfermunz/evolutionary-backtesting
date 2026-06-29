@@ -10,65 +10,69 @@ from src.fitness.metrics import biggest_loss
 
 import math
 
+def net_profit_fitness(trades, tick_value, commission):
 
-def basic_profit_fitness(trades, tick_value, commission):
-        
-    net_profit_value = net_profit(trades, tick_value, commission)
-    numbers_of_trades = len(trades)
+    number_of_trades = len(trades)
 
-    if numbers_of_trades < 10:
+    if number_of_trades < 10:
         return -1000
 
-    fitness = net_profit_value
+    return net_profit(trades, tick_value, commission)
 
-    return fitness
+
+def expectancy_fitness(trades, tick_value, commission):
+
+    number_of_trades = len(trades)
     
-def profit_trade_fitness(trades, tick_value, commission):
-        
-    net_profit_value = net_profit(trades, tick_value, commission)
-    numbers_of_trades = len(trades)
-
-    if numbers_of_trades < 10:
+    if number_of_trades < 10:
         return -1000
 
-    fitness = net_profit_value* math.sqrt(numbers_of_trades)
+    return average_trade(trades, tick_value, commission)
 
-    return fitness
-    
-def basic_drawdown_fitness(trades, tick_value, commission):
 
-    net_profit_value = net_profit(trades, tick_value, commission)
-    max_drawdown_value = max_drawdown(trades, tick_value, commission)
-    numbers_of_trades = len(trades)
+def drawdown_adjusted_fitness(trades, tick_value, commission):
 
-    if numbers_of_trades < 10:
+    number_of_trades = len(trades)
+
+    if number_of_trades < 10:
         return -1000
 
-    fitness = (net_profit_value)/(1+max_drawdown_value)
+    profit = net_profit(trades, tick_value, commission)
+    drawdown = max_drawdown(trades, tick_value, commission)
+
+    fitness = profit / (1 + drawdown)
 
     return fitness
-    
-def drawdown_trade_fitness(trades, tick_value, commission):
 
-    net_profit_value = net_profit(trades, tick_value, commission)
-    max_drawdown_value = max_drawdown(trades, tick_value, commission)
-    numbers_of_trades = len(trades)
 
-    if numbers_of_trades < 10:
+def balanced_fitness(trades, tick_value, commission):
+
+    number_of_trades = len(trades)
+
+    if number_of_trades < 10:
         return -1000
 
-    fitness = (net_profit_value*math.sqrt(numbers_of_trades))/(1+max_drawdown_value)
+    profit = net_profit(trades, tick_value, commission)
+    drawdown = max_drawdown(trades, tick_value, commission)
+    win_rate_ratio = win_rate(trades, tick_value, commission)
+
+    fitness = (profit*win_rate_ratio*math.sqrt(number_of_trades))/(1+drawdown)
 
     return fitness
-    
-def complex_fitness(trades, tick_value, commission):
 
-    net_profit_value = net_profit(trades, tick_value, commission)
-    max_drawdown_value = max_drawdown(trades, tick_value, commission)
+
+def robust_fitness(trades, tick_value, commission):
+
+    number_of_trades = len(trades)
+
+    if number_of_trades < 10:
+        return -1000
+
+    profit = net_profit(trades, tick_value, commission)
+    drawdown = max_drawdown(trades, tick_value, commission)
     win_rate_ratio = win_rate(trades, tick_value, commission)
     losing_streak = biggest_losing_streak(trades, tick_value, commission)
-    numbers_of_trades = len(trades)
 
-    fitness = (net_profit_value*win_rate_ratio*math.sqrt(numbers_of_trades))/((1+max_drawdown_value)*(1+losing_streak))
-        
+    fitness = (profit*win_rate_ratio*math.sqrt(number_of_trades))/((1 + drawdown)*math.sqrt(1 + losing_streak))
+
     return fitness
