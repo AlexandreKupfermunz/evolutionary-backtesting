@@ -72,7 +72,7 @@ class GenerationResult:
         self.biggest_losing_streak = biggest_losing_streak
         self.patience_counter = patience_counter
 
-def create_walk_forward_windows(df_length, train_size, test_size, step_size):
+def create_rolling_walk_forward_windows(df_length, train_size, test_size, step_size):
 
     windows = []
 
@@ -80,10 +80,31 @@ def create_walk_forward_windows(df_length, train_size, test_size, step_size):
     
     for i in range(number_of_windows):
 
-        train_start =  i * step_size
-        train_end  = train_size + i * step_size 
-        test_start = train_size + i * step_size 
-        test_end = train_size + test_size + i * step_size
+        offset = i * step_size
+
+        train_start = offset
+        train_end = train_size + offset
+        test_start = train_end
+        test_end = test_start + test_size
+
+        windows.append(WalkForwardWindow(train_start, train_end, test_start, test_end))
+
+    return windows 
+
+def create_expanding_walk_forward_windows(df_length, train_size, test_size, step_size):
+
+    windows = []
+
+    number_of_windows = ((df_length - train_size - test_size) // step_size) + 1
+    
+    for i in range(number_of_windows):
+
+        offset = i * step_size
+
+        train_start = 0
+        train_end = train_size + offset
+        test_start = train_end
+        test_end = test_start + test_size
 
         windows.append(WalkForwardWindow(train_start, train_end, test_start, test_end))
 
