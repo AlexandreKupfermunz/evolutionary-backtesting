@@ -15,7 +15,7 @@ from src.fitness.fitness_functions import robust_fitness
 
 print("test")
 
-NUMBERS_OF_GENERATIONS = 10
+NUMBER_OF_GENERATIONS = 10
 POPULATION_SIZE = 10
 
 MAXIMUM_HOLDING_BARS = 200
@@ -35,6 +35,12 @@ CANDLES = 1000
 ONE_DAY = CANDLES
 TWO_DAYS = ONE_DAY * 2
 THREE_DAYS = ONE_DAY * 3
+
+## daily_counts = df.groupby("Date").size()
+## ONE_WEEK = int(daily_counts.rolling(5).sum().median()) 
+## TWO_WEEKS = int(daily_counts.rolling(10).sum().median()) 
+## ONE_MONTH = int(daily_counts.rolling(20).sum().median()) 
+##TWO_MONTHS = int(daily_counts.rolling(40).sum().median())
 
 TEST_SIZE = ONE_DAY
 STEP_SIZE = ONE_DAY
@@ -65,7 +71,7 @@ for fitness_function in FITNESS_FUNCTIONS:
 
         walk_forward_results, generation_train_results, generation_test_results = run_walk_forward(df, 
                                                                                     windows, 
-                                                                                    NUMBERS_OF_GENERATIONS, 
+                                                                                    NUMBER_OF_GENERATIONS, 
                                                                                     POPULATION_SIZE, 
                                                                                     fitness_function, 
                                                                                     TICK_VALUE, 
@@ -121,14 +127,14 @@ for fitness_function in FITNESS_FUNCTIONS:
                 continue
 
             walk_forward_results, generation_train_results, generation_test_results = run_walk_forward(df, 
-                                                                        windows, 
-                                                                        NUMBERS_OF_GENERATIONS, 
-                                                                        POPULATION_SIZE, 
-                                                                        fitness_function, 
-                                                                        TICK_VALUE, 
-                                                                        COMMISSION, 
-                                                                        MAXIMUM_HOLDING_BARS, 
-                                                                        PATIENCE)
+                                                                                        windows, 
+                                                                                        NUMBER_OF_GENERATIONS, 
+                                                                                        POPULATION_SIZE, 
+                                                                                        fitness_function, 
+                                                                                        TICK_VALUE, 
+                                                                                        COMMISSION, 
+                                                                                        MAXIMUM_HOLDING_BARS, 
+                                                                                        PATIENCE)
 
             walk_forward_df = pd.DataFrame(
                 [result.to_dict() for result in walk_forward_results]
