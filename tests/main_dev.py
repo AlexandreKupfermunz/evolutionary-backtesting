@@ -6,8 +6,6 @@ from data.data_loader import load_data
 from src.trading.walk_forward import create_rolling_walk_forward_windows
 from src.trading.walk_forward import create_expanding_walk_forward_windows
 from src.trading.walk_forward import run_walk_forward
-from src.trading.walk_forward import WalkForwardResult
-from src.trading.walk_forward import GenerationResult
 
 from src.fitness.fitness_functions import net_profit_fitness
 from src.fitness.fitness_functions import expectancy_fitness
@@ -61,29 +59,39 @@ for fitness_function in FITNESS_FUNCTIONS:
         repetition_folder.mkdir(parents=True, exist_ok=True)
 
         windows = create_expanding_walk_forward_windows(DATA_SIZE, INITIAL_TRAIN_SIZE, TEST_SIZE, STEP_SIZE)
-        walk_forward_results, generation_results = run_walk_forward(df, 
-                                                                    windows, 
-                                                                    NUMBERS_OF_GENERATIONS, 
-                                                                    POPULATION_SIZE, 
-                                                                    fitness_function, 
-                                                                    TICK_VALUE, 
-                                                                    COMMISSION, 
-                                                                    MAXIMUM_HOLDING_BARS, 
-                                                                    PATIENCE)
+        
+        if len(windows) == 0:
+            continue
+
+        walk_forward_results, generation_train_results, generation_test_results = run_walk_forward(df, 
+                                                                                    windows, 
+                                                                                    NUMBERS_OF_GENERATIONS, 
+                                                                                    POPULATION_SIZE, 
+                                                                                    fitness_function, 
+                                                                                    TICK_VALUE, 
+                                                                                    COMMISSION, 
+                                                                                    MAXIMUM_HOLDING_BARS, 
+                                                                                    PATIENCE)
         
         walk_forward_df = pd.DataFrame(
             [result.to_dict() for result in walk_forward_results]
         )
 
-        generation_df = pd.DataFrame(
-            [result.to_dict() for result in generation_results]
+        generation_train_df = pd.DataFrame(
+            [result.to_dict() for result in generation_train_results]
+        )
+
+        generation_test_df = pd.DataFrame(
+            [result.to_dict() for result in generation_test_results]
         )
 
         walk_forward_csv = repetition_folder / "walk_forward_results.csv"
-        generation_csv = repetition_folder / "generation_results.csv"
+        generation_train_csv = repetition_folder / "generation_train_results.csv"
+        generation_test_csv = repetition_folder / "generation_test_results.csv"
 
         walk_forward_df.to_csv(walk_forward_csv, index=False)
-        generation_df.to_csv(generation_csv, index=False)
+        generation_train_df.to_csv(generation_train_csv, index=False)
+        generation_test_df.to_csv(generation_test_csv, index=False)
 
 ## rolling
 TRAIN_SIZES = {
@@ -108,7 +116,11 @@ for fitness_function in FITNESS_FUNCTIONS:
             repetition_folder.mkdir(parents=True, exist_ok=True)
 
             windows = create_rolling_walk_forward_windows(DATA_SIZE, train_size, TEST_SIZE, STEP_SIZE)
-            walk_forward_results, generation_results = run_walk_forward(df, 
+
+            if len(windows) == 0:
+                continue
+
+            walk_forward_results, generation_train_results, generation_test_results = run_walk_forward(df, 
                                                                         windows, 
                                                                         NUMBERS_OF_GENERATIONS, 
                                                                         POPULATION_SIZE, 
@@ -117,18 +129,25 @@ for fitness_function in FITNESS_FUNCTIONS:
                                                                         COMMISSION, 
                                                                         MAXIMUM_HOLDING_BARS, 
                                                                         PATIENCE)
-            
-            
+
             walk_forward_df = pd.DataFrame(
                 [result.to_dict() for result in walk_forward_results]
             )
 
-            generation_df = pd.DataFrame(
-                [result.to_dict() for result in generation_results]
+            generation_train_df = pd.DataFrame(
+                [result.to_dict() for result in generation_train_results]
+            )
+
+            generation_test_df = pd.DataFrame(
+                [result.to_dict() for result in generation_test_results]
             )
 
             walk_forward_csv = repetition_folder / "walk_forward_results.csv"
-            generation_csv = repetition_folder / "generation_results.csv"
+            generation_train_csv = repetition_folder / "generation_train_results.csv"
+            generation_test_csv = repetition_folder / "generation_test_results.csv"
 
             walk_forward_df.to_csv(walk_forward_csv, index=False)
-            generation_df.to_csv(generation_csv, index=False)
+            generation_train_df.to_csv(generation_train_csv, index=False)
+            generation_test_df.to_csv(generation_test_csv, index=False)
+
+            

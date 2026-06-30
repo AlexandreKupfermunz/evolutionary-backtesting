@@ -15,6 +15,8 @@ from src.fitness.metrics import win_rate
 from src.fitness.metrics import average_trade
 from src.fitness.metrics import biggest_loss
 
+from src.trading.performance import PerformanceMetrics
+
 class WalkForwardWindow:
 
     def __init__(self, train_start, train_end, test_start, test_end):
@@ -37,12 +39,12 @@ class WalkForwardResult:
     def __init__(self, 
                 window,
                 best_individual,
-                train_fitness,
-                test_fitness):  
+                test_fitness,
+                test_metrics):  
         self.window = window
         self.best_individual = best_individual
-        self.train_fitness = train_fitness
         self.test_fitness = test_fitness
+        self.test_metrics = test_metrics
 
     def to_dict(self):
         row = {}
@@ -51,10 +53,9 @@ class WalkForwardResult:
 
         row.update(self.best_individual.to_dict())
 
-        row.update({
-            "train_fitness": self.train_fitness,
-            "test_fitness": self.test_fitness
-        })
+        row.update({"test_fitness": self.test_fitness})
+
+        row.update(self.test_metrics.to_dict())
         
         return row
 
@@ -66,34 +67,14 @@ class GenerationResult:
         window,
         generation,
         best_individual,
-        fitness,
-        number_of_trades,
-        net_profit,
-        gross_profit,
-        gross_loss,
-        profit_factor,
-        max_drawdown,
-        win_rate,
-        average_trade,
-        biggest_loss,
-        biggest_losing_streak,
+        metrics,
         patience_counter,
     ):
         self.dataset_type = dataset_type
         self.window = window
         self.generation = generation
         self.best_individual = best_individual
-        self.fitness = fitness
-        self.number_of_trades = number_of_trades
-        self.net_profit = net_profit
-        self.gross_profit = gross_profit
-        self.gross_loss = gross_loss
-        self.profit_factor = profit_factor
-        self.max_drawdown = max_drawdown
-        self.win_rate = win_rate
-        self.average_trade = average_trade
-        self.biggest_loss = biggest_loss
-        self.biggest_losing_streak = biggest_losing_streak
+        self.metrics = metrics
         self.patience_counter = patience_counter
 
     def to_dict(self):
@@ -106,20 +87,8 @@ class GenerationResult:
 
         row.update(self.window.to_dict())
         row.update(self.best_individual.to_dict())
-
-        row.update({
-            "number_of_trades": self.number_of_trades,
-            "net_profit": self.net_profit,
-            "gross_profit": self.gross_profit,
-            "gross_loss": self.gross_loss,
-            "profit_factor": self.profit_factor,
-            "max_drawdown": self.max_drawdown,
-            "win_rate": self.win_rate,
-            "average_trade": self.average_trade,
-            "biggest_loss": self.biggest_loss,
-            "biggest_losing_streak": self.biggest_losing_streak,
-            "patience_counter": self.patience_counter,
-        })
+        row.update(self.metrics.to_dict())
+        row.update({"patience_counter": self.patience_counter})
 
         return row
 
@@ -164,7 +133,8 @@ def create_expanding_walk_forward_windows(df_length, train_size, test_size, step
 def run_walk_forward(df, windows, number_of_generations, population_size, fitness_function, tick_value, commission, maximum_holding_bars, patience):
 
     walk_forward_results = []
-    generation_results = []
+    generation_train_results = []
+    generation_test_results = []
 
     for window in windows:
 
@@ -180,17 +150,9 @@ def run_walk_forward(df, windows, number_of_generations, population_size, fitnes
 
         train_signal_df = generate_signals(train_df.copy(), current_best_individual)
         original_train_trades = backtester(train_signal_df, current_best_individual, maximum_holding_bars)
+        current_best_individual_train = copy_individual(current_best_individual)
 
-        test_signal_df = generate_signals(test_df.copy(), current_best_individual)
-        original_test_trades = backtester(test_signal_df, current_best_individual, maximum_holding_bars)
-        original_test_fitness = fitness_function(original_test_trades, tick_value, commission)
-
-        generation_results.append(GenerationResult(
-                                        dataset_type="train",
-                                        window=window,
-                                        generation=0,
-                                        best_individual=current_best_individual,
-                                        fitness=current_best_individual.fitness,
+        original_train_metrics = PerformanceMetrics(
                                         number_of_trades=len(original_train_trades),
                                         net_profit=net_profit(original_train_trades, tick_value, commission),
                                         gross_profit=gross_profit(original_train_trades, tick_value, commission),
@@ -201,15 +163,24 @@ def run_walk_forward(df, windows, number_of_generations, population_size, fitnes
                                         average_trade=average_trade(original_train_trades, tick_value, commission),
                                         biggest_loss=biggest_loss(original_train_trades, tick_value, commission),
                                         biggest_losing_streak=biggest_losing_streak(original_train_trades, tick_value, commission),
-                                        patience_counter=0
-                                    ))
+                                        )
         
-        generation_results.append(GenerationResult(
-                                        dataset_type="test",
+        generation_train_results.append(GenerationResult(
+                                        dataset_type="train",
                                         window=window,
                                         generation=0,
-                                        best_individual=current_best_individual,
-                                        fitness=original_test_fitness,
+                                        best_individual=current_best_individual_train,
+                                        metrics = original_train_metrics,
+                                        patience_counter=0
+                                    ))
+
+        test_signal_df = generate_signals(test_df.copy(), current_best_individual)
+        original_test_trades = backtester(test_signal_df, current_best_individual, maximum_holding_bars)
+        original_test_fitness = fitness_function(original_test_trades, tick_value, commission)
+        current_best_individual_test = copy_individual(current_best_individual)
+        current_best_individual_test.fitness = original_test_fitness
+        
+        original_test_metrics = PerformanceMetrics(
                                         number_of_trades=len(original_test_trades),
                                         net_profit=net_profit(original_test_trades, tick_value, commission),
                                         gross_profit=gross_profit(original_test_trades, tick_value, commission),
@@ -220,6 +191,14 @@ def run_walk_forward(df, windows, number_of_generations, population_size, fitnes
                                         average_trade=average_trade(original_test_trades, tick_value, commission),
                                         biggest_loss=biggest_loss(original_test_trades, tick_value, commission),
                                         biggest_losing_streak=biggest_losing_streak(original_test_trades, tick_value, commission),
+                                        )
+        
+        generation_test_results.append(GenerationResult(
+                                        dataset_type="test",
+                                        window=window,
+                                        generation=0,
+                                        best_individual=current_best_individual_test,
+                                        metrics = original_test_metrics,
                                         patience_counter=0
                                     ))
 
@@ -254,17 +233,9 @@ def run_walk_forward(df, windows, number_of_generations, population_size, fitnes
 
             best_train_signal_df = generate_signals(train_df.copy(), best_individual_so_far)
             best_train_trades = backtester(best_train_signal_df, best_individual_so_far, maximum_holding_bars)
+            best_individual_so_far_train = copy_individual(best_individual_so_far)
 
-            best_test_signal_df = generate_signals(test_df.copy(), best_individual_so_far)
-            best_trained_test_trades = backtester(best_test_signal_df, best_individual_so_far, maximum_holding_bars)
-            test_fitness = fitness_function(best_trained_test_trades, tick_value, commission)
-
-            generation_results.append(GenerationResult(
-                                        dataset_type="train",
-                                        window=window,
-                                        generation=i,
-                                        best_individual=best_individual_so_far,
-                                        fitness=best_individual_so_far.fitness,
+            train_metrics = PerformanceMetrics(
                                         number_of_trades=len(best_train_trades),
                                         net_profit=net_profit(best_train_trades, tick_value, commission),
                                         gross_profit=gross_profit(best_train_trades, tick_value, commission),
@@ -275,15 +246,24 @@ def run_walk_forward(df, windows, number_of_generations, population_size, fitnes
                                         average_trade=average_trade(best_train_trades, tick_value, commission),
                                         biggest_loss=biggest_loss(best_train_trades, tick_value, commission),
                                         biggest_losing_streak=biggest_losing_streak(best_train_trades, tick_value, commission),
+                                        )
+
+            generation_train_results.append(GenerationResult(
+                                        dataset_type="train",
+                                        window=window,
+                                        generation=i,
+                                        best_individual=best_individual_so_far_train,
+                                        metrics = train_metrics,
                                         patience_counter=generations_without_improvement,
                                     ))
             
-            generation_results.append(GenerationResult(
-                                        dataset_type="test",
-                                        window=window,
-                                        generation=i,
-                                        best_individual=best_individual_so_far,
-                                        fitness=test_fitness,
+            best_test_signal_df = generate_signals(test_df.copy(), best_individual_so_far)
+            best_trained_test_trades = backtester(best_test_signal_df, best_individual_so_far, maximum_holding_bars)
+            test_fitness = fitness_function(best_trained_test_trades, tick_value, commission)
+            best_individual_so_far_test = copy_individual(best_individual_so_far)
+            best_individual_so_far_test.fitness = test_fitness
+
+            test_metrics = PerformanceMetrics(
                                         number_of_trades=len(best_trained_test_trades),
                                         net_profit=net_profit(best_trained_test_trades, tick_value, commission),
                                         gross_profit=gross_profit(best_trained_test_trades, tick_value, commission),
@@ -294,6 +274,14 @@ def run_walk_forward(df, windows, number_of_generations, population_size, fitnes
                                         average_trade=average_trade(best_trained_test_trades, tick_value, commission),
                                         biggest_loss=biggest_loss(best_trained_test_trades, tick_value, commission),
                                         biggest_losing_streak=biggest_losing_streak(best_trained_test_trades, tick_value, commission),
+                                        )
+            
+            generation_test_results.append(GenerationResult(
+                                        dataset_type="test",
+                                        window=window,
+                                        generation=i,
+                                        best_individual=best_individual_so_far_test,
+                                        metrics = test_metrics,
                                         patience_counter=generations_without_improvement
                                     ))
 
@@ -333,12 +321,23 @@ def run_walk_forward(df, windows, number_of_generations, population_size, fitnes
 
         test_fitness = fitness_function(test_trades, tick_value, commission)
 
-        best_individual_copy_for_test.fitness = test_fitness
+        test_metrics = PerformanceMetrics(
+                                        number_of_trades=len(test_trades),
+                                        net_profit=net_profit(test_trades, tick_value, commission),
+                                        gross_profit=gross_profit(test_trades, tick_value, commission),
+                                        gross_loss=gross_loss(test_trades, tick_value, commission),
+                                        profit_factor=profit_factor(test_trades, tick_value, commission),
+                                        max_drawdown=max_drawdown(test_trades, tick_value, commission),
+                                        win_rate=win_rate(test_trades, tick_value, commission),
+                                        average_trade=average_trade(test_trades, tick_value, commission),
+                                        biggest_loss=biggest_loss(test_trades, tick_value, commission),
+                                        biggest_losing_streak=biggest_losing_streak(test_trades, tick_value,commission)
+                                        )
 
         walk_forward_results.append(WalkForwardResult(window = window, 
-                                         best_individual = best_individual_so_far, 
-                                         train_fitness = best_individual_so_far.fitness, 
-                                         test_fitness = best_individual_copy_for_test.fitness))
+                                         best_individual = best_individual_copy_for_test, 
+                                         test_fitness = test_fitness,
+                                         test_metrics = test_metrics))
 
         print(f"Best trained individual on test data:")
         best_individual_copy_for_test.print_parameters()
@@ -346,4 +345,4 @@ def run_walk_forward(df, windows, number_of_generations, population_size, fitnes
         print(f"Profit: {net_profit(test_trades, tick_value, commission)}")
         print("")
     
-    return walk_forward_results, generation_results
+    return walk_forward_results, generation_train_results, generation_test_results
