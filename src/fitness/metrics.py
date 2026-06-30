@@ -56,6 +56,12 @@ def profit_factor(trades, tick_value, commission):
 
     gross_profit_value = gross_profit(trades, tick_value, commission)
     gross_loss_value = gross_loss(trades, tick_value, commission)
+    
+    if len(trades) == 0:
+        return None
+
+    gross_profit_value = gross_profit(trades, tick_value, commission)
+    gross_loss_value = gross_loss(trades, tick_value, commission)
 
     if gross_loss_value == 0:
         return float("inf")

@@ -23,6 +23,15 @@ class WalkForwardWindow:
         self.test_start = test_start
         self.test_end = test_end
 
+    def to_dict(self):
+
+        return({
+            "train_start": self.train_start,
+            "train_end": self.train_end,
+            "test_start": self.test_start,
+            "test_end": self.test_end
+        })
+
 class WalkForwardResult:
 
     def __init__(self, 
@@ -36,12 +45,18 @@ class WalkForwardResult:
         self.test_fitness = test_fitness
 
     def to_dict(self):
-        return {
-            "train_start": self.train_start,
-            "train_end": self.train_end,
-            "test_start": self.test_start,
-            "test_end": self.test_end,
-        }
+        row = {}
+
+        row.update(self.window.to_dict())
+
+        row.update(self.best_individual.to_dict())
+
+        row.update({
+            "train_fitness": self.train_fitness,
+            "test_fitness": self.test_fitness
+        })
+        
+        return row
 
 class GenerationResult:
 
@@ -216,6 +231,7 @@ def run_walk_forward(df, windows, number_of_generations, population_size, fitnes
 
         print(f"Current test results")
         print(f"Number of trades: {len(original_test_trades)}")
+        print(f"Test fitness: {original_test_fitness}")
         print(f"Profit: {net_profit(original_test_trades, tick_value, commission)}")
         print("")
 
@@ -290,8 +306,9 @@ def run_walk_forward(df, windows, number_of_generations, population_size, fitnes
                 print("")
 
                 print(f"Current test results")
-                print(f"Number of trades: {len(best_train_trades)}")
-                print(f"Profit: {net_profit(best_train_trades, tick_value, commission)}")
+                print(f"Number of trades: {len(best_trained_test_trades)}")
+                print(f"Test fitness: {test_fitness}")
+                print(f"Profit: {net_profit(best_trained_test_trades, tick_value, commission)}")
                 print("")
                 
                 break
@@ -303,8 +320,9 @@ def run_walk_forward(df, windows, number_of_generations, population_size, fitnes
             print("")
 
             print(f"Current test results")
-            print(f"Number of trades: {len(best_train_trades)}")
-            print(f"Profit: {net_profit(best_train_trades, tick_value, commission)}")
+            print(f"Number of trades: {len(best_trained_test_trades)}")
+            print(f"Test fitness: {test_fitness}")
+            print(f"Profit: {net_profit(best_trained_test_trades, tick_value, commission)}")
             print("")
         
         best_individual_copy_for_test = copy_individual(best_individual_so_far)

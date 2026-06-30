@@ -6,6 +6,8 @@ from data.data_loader import load_data
 from src.trading.walk_forward import create_rolling_walk_forward_windows
 from src.trading.walk_forward import create_expanding_walk_forward_windows
 from src.trading.walk_forward import run_walk_forward
+from src.trading.walk_forward import WalkForwardResult
+from src.trading.walk_forward import GenerationResult
 
 from src.fitness.fitness_functions import net_profit_fitness
 from src.fitness.fitness_functions import expectancy_fitness
@@ -69,8 +71,13 @@ for fitness_function in FITNESS_FUNCTIONS:
                                                                     MAXIMUM_HOLDING_BARS, 
                                                                     PATIENCE)
         
-        walk_forward_df = pd.DataFrame([vars(result) for result in walk_forward_results])
-        generation_df = pd.DataFrame([vars(result) for result in generation_results])
+        walk_forward_df = pd.DataFrame(
+            [result.to_dict() for result in walk_forward_results]
+        )
+
+        generation_df = pd.DataFrame(
+            [result.to_dict() for result in generation_results]
+        )
 
         walk_forward_csv = repetition_folder / "walk_forward_results.csv"
         generation_csv = repetition_folder / "generation_results.csv"
@@ -111,8 +118,14 @@ for fitness_function in FITNESS_FUNCTIONS:
                                                                         MAXIMUM_HOLDING_BARS, 
                                                                         PATIENCE)
             
-            walk_forward_df = pd.DataFrame([vars(result) for result in walk_forward_results])
-            generation_df = pd.DataFrame([vars(result) for result in generation_results])
+            
+            walk_forward_df = pd.DataFrame(
+                [result.to_dict() for result in walk_forward_results]
+            )
+
+            generation_df = pd.DataFrame(
+                [result.to_dict() for result in generation_results]
+            )
 
             walk_forward_csv = repetition_folder / "walk_forward_results.csv"
             generation_csv = repetition_folder / "generation_results.csv"
