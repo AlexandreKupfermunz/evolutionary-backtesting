@@ -35,6 +35,13 @@ class WalkForwardResult:
         self.train_fitness = train_fitness
         self.test_fitness = test_fitness
 
+    def to_dict(self):
+        return {
+            "train_start": self.train_start,
+            "train_end": self.train_end,
+            "test_start": self.test_start,
+            "test_end": self.test_end,
+        }
 
 class GenerationResult:
 
@@ -73,6 +80,33 @@ class GenerationResult:
         self.biggest_loss = biggest_loss
         self.biggest_losing_streak = biggest_losing_streak
         self.patience_counter = patience_counter
+
+    def to_dict(self):
+        row = {}
+
+        row.update({
+            "dataset_type": self.dataset_type,
+            "generation": self.generation,
+        })
+
+        row.update(self.window.to_dict())
+        row.update(self.best_individual.to_dict())
+
+        row.update({
+            "number_of_trades": self.number_of_trades,
+            "net_profit": self.net_profit,
+            "gross_profit": self.gross_profit,
+            "gross_loss": self.gross_loss,
+            "profit_factor": self.profit_factor,
+            "max_drawdown": self.max_drawdown,
+            "win_rate": self.win_rate,
+            "average_trade": self.average_trade,
+            "biggest_loss": self.biggest_loss,
+            "biggest_losing_streak": self.biggest_losing_streak,
+            "patience_counter": self.patience_counter,
+        })
+
+        return row
 
 def create_rolling_walk_forward_windows(df_length, train_size, test_size, step_size):
 

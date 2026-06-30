@@ -17,6 +17,17 @@ class Individual:
         self.stop_loss_ticks = stop_loss_ticks
         self.fitness = 0
 
+    def to_dict(self):
+        return {
+            "min_impulse_candles": self.min_impulse_candles,
+            "max_duration_ms": self.max_duration_ms,
+            "diagonal_imbalance_ratio_threshold": self.diagonal_imbalance_ratio_threshold,
+            "min_imbalance_count": self.min_imbalance_count,
+            "take_profit_ticks": self.take_profit_ticks,
+            "stop_loss_ticks": self.stop_loss_ticks,
+            "individual_fitness": self.fitness,
+        }
+
     def print_parameters(self):
 
         print(f"Min impulse Candles: {self.min_impulse_candles}")
