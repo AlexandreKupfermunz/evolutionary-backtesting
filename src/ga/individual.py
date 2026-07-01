@@ -25,7 +25,7 @@ class Individual:
             "min_imbalance_count": self.min_imbalance_count,
             "take_profit_ticks": self.take_profit_ticks,
             "stop_loss_ticks": self.stop_loss_ticks,
-            "individual_fitness": self.fitness,
+            "fitness": self.fitness,
         }
 
     def print_parameters(self):

@@ -101,9 +101,9 @@ for fitness_function in FITNESS_FUNCTIONS:
 
 ## rolling
 TRAIN_SIZES = {
-    "ONE_DAY": ONE_DAY,
-    "TWO_DAYS": TWO_DAYS,
-    "THREE_DAYS": THREE_DAYS,
+    "1_day": ONE_DAY,
+    "2_days": TWO_DAYS,
+    "3_days": THREE_DAYS,
 }
 for fitness_function in FITNESS_FUNCTIONS:
 

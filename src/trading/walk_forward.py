@@ -21,7 +21,8 @@ from src.trading.performance import PerformanceMetrics
 
 class WalkForwardWindow:
 
-    def __init__(self, train_start, train_end, test_start, test_end):
+    def __init__(self, window_id, train_start, train_end, test_start, test_end):
+        self.window_id = window_id
         self.train_start = train_start
         self.train_end = train_end
         self.test_start = test_start
@@ -30,6 +31,7 @@ class WalkForwardWindow:
     def to_dict(self):
 
         return({
+            "window_id": self.window_id,
             "train_start": self.train_start,
             "train_end": self.train_end,
             "test_start": self.test_start,
@@ -99,6 +101,8 @@ def create_rolling_walk_forward_windows(df_length, train_size, test_size, step_s
     windows = []
 
     number_of_windows = ((df_length - train_size - test_size) // step_size) + 1
+
+    window_id = 0
     
     for i in range(number_of_windows):
 
@@ -109,7 +113,9 @@ def create_rolling_walk_forward_windows(df_length, train_size, test_size, step_s
         test_start = train_end
         test_end = test_start + test_size
 
-        windows.append(WalkForwardWindow(train_start, train_end, test_start, test_end))
+        windows.append(WalkForwardWindow(window_id, train_start, train_end, test_start, test_end))
+
+        window_id += 1
 
     return windows 
 
@@ -118,6 +124,8 @@ def create_expanding_walk_forward_windows(df_length, train_size, test_size, step
     windows = []
 
     number_of_windows = ((df_length - train_size - test_size) // step_size) + 1
+
+    window_id = 0
     
     for i in range(number_of_windows):
 
@@ -128,7 +136,9 @@ def create_expanding_walk_forward_windows(df_length, train_size, test_size, step
         test_start = train_end
         test_end = test_start + test_size
 
-        windows.append(WalkForwardWindow(train_start, train_end, test_start, test_end))
+        windows.append(WalkForwardWindow(window_id, train_start, train_end, test_start, test_end))
+
+        window_id += 1
 
     return windows 
 
@@ -209,6 +219,8 @@ def run_walk_forward(df, windows, number_of_generations, population_size, fitnes
         test_trades = backtester(test_signal_df, best_individual_copy_for_test, maximum_holding_bars)
 
         test_fitness = fitness_function(test_trades, tick_value, commission)
+
+        best_individual_copy_for_test.fitness = test_fitness
 
         test_metrics = calculate_performance_metrics(test_trades, tick_value, commission)
 
