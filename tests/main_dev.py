@@ -2,6 +2,7 @@ from pathlib import Path
 import pandas as pd
 
 from data.data_loader import load_data
+from src.features.impulse_strategy_features import add_impulse_strategy_features
 
 from src.trading.walk_forward import create_rolling_walk_forward_windows
 from src.trading.walk_forward import create_expanding_walk_forward_windows
@@ -33,6 +34,7 @@ COMMISSION = 4
 FITNESS_FUNCTIONS = [balanced_fitness]
 
 df = load_data("data/NQ-Sample_Data.txt")
+df = add_impulse_strategy_features(df)
 
 DATA_SIZE = len(df)
 

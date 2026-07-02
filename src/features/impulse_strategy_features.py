@@ -40,19 +40,19 @@ def add_impulse_features(df):
     consecutive_up_count = 0
     consecutive_down_count = 0
 
-    up = df["up"]
-    down = df["down"]
+    up = df["up"].to_numpy(dtype=int)
+    down = df["down"].to_numpy(dtype=int)
 
     consecutive_up = []
     consecutive_down = []
     
     for i in range(len(up)):
-        if up.iloc[i]:
+        if up[i]==1:
             consecutive_down_count = 0
             consecutive_up_count += 1
             consecutive_up.append(consecutive_up_count)
             consecutive_down.append(consecutive_down_count)
-        elif down.iloc[i]:
+        elif down[i] == 1:
             consecutive_up_count = 0
             consecutive_down_count += 1
             consecutive_up.append(consecutive_up_count)
@@ -72,25 +72,25 @@ def add_time_feature(df):
 
     df["timestamp"] = pd.to_datetime(df["Date"] + " " + df["Time"], format="mixed")
     
-    consecutive_up = df["consecutive_up"] 
-    consecutive_down = df["consecutive_down"]
-    timestamps = df["timestamp"]
+    consecutive_up = df["consecutive_up"].to_numpy(dtype=int)
+    consecutive_down = df["consecutive_down"].to_numpy(dtype=int)
+    timestamps = df["timestamp"].to_numpy()
 
     impulse_duration_ms = [] 
 
     for i in range(len(df)):
 
-        n_up = consecutive_up.iloc[i]
-        n_down = consecutive_down.iloc[i]
+        n_up = consecutive_up[i]
+        n_down = consecutive_down[i]
 
         if n_up > 0:
             start_index = i-(n_up-1)
-            duration_ms = 1000*((timestamps.iloc[i]- timestamps.iloc[start_index]).total_seconds())
+            duration_ms = (timestamps[i] - timestamps[start_index]) / np.timedelta64(1, "ms")
             impulse_duration_ms.append(duration_ms)
         
         elif n_down > 0:
             start_index = i-(n_down-1)
-            duration_ms = 1000*((timestamps.iloc[i]- timestamps.iloc[start_index]).total_seconds())
+            duration_ms = (timestamps[i] - timestamps[start_index]) / np.timedelta64(1, "ms")
             impulse_duration_ms.append(duration_ms)
         
         else:

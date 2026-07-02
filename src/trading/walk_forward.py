@@ -143,11 +143,8 @@ def run_walk_forward(df, windows, number_of_generations, population_size, fitnes
 
     for window in windows:
 
-        train_df = df.iloc[window.train_start:window.train_end].copy()
-        test_df = df.iloc[window.test_start:window.test_end].copy()
-
-        train_df = add_impulse_strategy_features(train_df)
-        test_df = add_impulse_strategy_features(test_df)
+        train_df = df.iloc[window.train_start:window.train_end]
+        test_df = df.iloc[window.test_start:window.test_end]
 
         population = create_initial_population(train_df, population_size, fitness_function, tick_value, commission, maximum_holding_bars)
 
