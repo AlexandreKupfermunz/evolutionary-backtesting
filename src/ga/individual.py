@@ -1,5 +1,6 @@
 from src.trading.backtester import backtester
-from src.strategies.impulse_strategy import generate_signals
+from src.strategies.impulse_strategy import generate_impulse_signals
+
 import random
 
 THRESHOLD_RATIO_STEP = 0.25
@@ -61,7 +62,7 @@ def create_initial_population(df, population_size, fitness_function, tick_value,
         population.append(create_random_individual())
 
     for individual in population:
-        signal_df = generate_signals(df.copy(), individual)
+        signal_df = generate_impulse_signals(df, individual)
         trades = backtester(signal_df, individual, maximum_holding_bars)
         fitness = fitness_function(trades, tick_value, commission)
         individual.fitness = fitness

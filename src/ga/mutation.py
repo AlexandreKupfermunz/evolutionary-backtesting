@@ -4,7 +4,7 @@ THRESHOLD_RATIO_STEP = 0.25
 
 def mutation(individual):
 
-    random_number = random.randint(0,599)
+    random_number = random.randint(0,149)
     
     if random_number < 5:
 

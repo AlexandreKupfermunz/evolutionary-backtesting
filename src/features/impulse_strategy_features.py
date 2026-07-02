@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 MIN_IMBALANCE_RATIO = 3.0
 MAX_IMBALANCE_RATIO = 10.0
@@ -104,16 +105,48 @@ def precompute_imbalance_thresholds(df):
     start = int(MIN_IMBALANCE_RATIO / THRESHOLD_RATIO_STEP)
     end = int(MAX_IMBALANCE_RATIO / THRESHOLD_RATIO_STEP)
 
-    all_thresholds = []
+    consecutive_up = df["consecutive_up"].to_numpy(dtype=int)
+    consecutive_down = df["consecutive_down"].to_numpy(dtype=int)
 
-    for i in range(start, end+1):
-        all_thresholds.append(round(i * THRESHOLD_RATIO_STEP, 2))
+    for i in range(start, end + 1):
 
-    for threshold in all_thresholds:
-        df[f"is_imbalance_ratio_long_{format_threshold_for_column(threshold)}"] = df["diagonal_imbalance_ratio"] > threshold
-        df[f"is_imbalance_ratio_short_{format_threshold_for_column(threshold)}"] = df["diagonal_imbalance_ratio"] < 1/threshold
+        threshold = round(i * THRESHOLD_RATIO_STEP, 2)
+        threshold_name = format_threshold_for_column(threshold)
+
+        long_imbalance = (df["diagonal_imbalance_ratio"] > threshold).to_numpy(dtype=int)
+        short_imbalance = (df["diagonal_imbalance_ratio"] < 1 / threshold).to_numpy(dtype=int)
+
+        df[f"buy_imbalance_count_{threshold_name}"] = count_imbalances_in_impulse(
+            long_imbalance,
+            consecutive_up
+        )
+
+        df[f"sell_imbalance_count_{threshold_name}"] = count_imbalances_in_impulse(
+            short_imbalance,
+            consecutive_down
+        )
 
     return df
+
+def count_imbalances_in_impulse(imbalance_array, consecutive_array):
+
+    cumulative = np.cumsum(imbalance_array)
+
+    result = np.zeros(len(imbalance_array), dtype=int)
+
+    for i in range(len(imbalance_array)):
+
+        impulse_length = consecutive_array[i]
+
+        if impulse_length > 0:
+            start_index = i - impulse_length + 1
+
+            if start_index <= 0:
+                result[i] = cumulative[i]
+            else:
+                result[i] = cumulative[i] - cumulative[start_index - 1]
+
+    return result
 
 def format_threshold_for_column(threshold):
     threshold = round(float(threshold), 2)

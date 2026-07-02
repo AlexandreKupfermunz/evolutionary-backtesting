@@ -10,8 +10,8 @@ class Trade:
         self.entry_timestamp = entry_timestamp
         self.exit_timestamp = exit_timestamp
         self.result = result
-        self.window
-        self.generation
+        self.window = None
+        self.generation = None
 
     def to_dict(self):
 
@@ -31,6 +31,7 @@ class Trade:
         row.update(self.window.to_dict())
         row.update({"generation": self.generation})
 
+        return row
 
 def tradePrinter(trades):
     for i in range(len(trades)):

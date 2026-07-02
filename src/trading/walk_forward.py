@@ -1,5 +1,5 @@
 from src.features.impulse_strategy_features import add_impulse_strategy_features
-from src.strategies.impulse_strategy import generate_signals
+from src.strategies.impulse_strategy import generate_impulse_signals
 from src.ga.individual import create_initial_population
 from src.ga.evolution import make_new_population
 from src.trading.backtester import backtester
@@ -165,12 +165,12 @@ def run_walk_forward(df, windows, number_of_generations, population_size, fitnes
 
         current_best_individual = max(population, key=lambda individual: individual.fitness)
 
-        train_signal_df = generate_signals(train_df.copy(), current_best_individual)
+        train_signal_df = generate_impulse_signals(train_df, current_best_individual)
         original_train_trades = backtester(train_signal_df, current_best_individual, maximum_holding_bars)
         
         generation_train_results.append(create_generation_result("train", window, 0, current_best_individual, original_train_trades, fitness_function, tick_value, commission, 0))
 
-        test_signal_df = generate_signals(test_df.copy(), current_best_individual)
+        test_signal_df = generate_impulse_signals(test_df, current_best_individual)
         original_test_trades = backtester(test_signal_df, current_best_individual, maximum_holding_bars)
 
         for trade in original_test_trades:
@@ -203,12 +203,12 @@ def run_walk_forward(df, windows, number_of_generations, population_size, fitnes
             else:
                 generations_without_improvement += 1
 
-            current_train_signal_df = generate_signals(train_df.copy(), current_best_individual)
+            current_train_signal_df = generate_impulse_signals(train_df, current_best_individual)
             current_train_trades = backtester(current_train_signal_df, current_best_individual, maximum_holding_bars)
 
             generation_train_results.append(create_generation_result("train", window, i, current_best_individual, current_train_trades, fitness_function, tick_value, commission, generations_without_improvement))
 
-            current_test_signal_df = generate_signals(test_df.copy(), current_best_individual)
+            current_test_signal_df = generate_impulse_signals(test_df, current_best_individual)
             current_test_trades = backtester(current_test_signal_df, current_best_individual, maximum_holding_bars)
 
             generation_test_results.append(create_generation_result("test", window, i, current_best_individual, current_test_trades, fitness_function, tick_value, commission, generations_without_improvement))
@@ -231,7 +231,7 @@ def run_walk_forward(df, windows, number_of_generations, population_size, fitnes
         
         best_individual_copy_for_test = copy_individual(best_individual_so_far)
 
-        test_signal_df = generate_signals(test_df.copy(), best_individual_copy_for_test)
+        test_signal_df = generate_impulse_signals(test_df, best_individual_copy_for_test)
 
         test_trades = backtester(test_signal_df, best_individual_copy_for_test, maximum_holding_bars)
 

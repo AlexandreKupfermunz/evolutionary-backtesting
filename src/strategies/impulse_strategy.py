@@ -1,85 +1,24 @@
 from src.features.impulse_strategy_features import format_threshold_for_column
 
-def generate_signals(df, individual):
+def generate_impulse_signals(df, individual):
     
-    df = add_imbalance_count_feature(df, individual.diagonal_imbalance_ratio_threshold)
-    df = generate_long_signal(df, individual.min_impulse_candles, individual.max_duration_ms, individual.min_imbalance_count )
-    df = generate_short_signal(df, individual.min_impulse_candles, individual.max_duration_ms, individual.min_imbalance_count )
+    threshold_name = format_threshold_for_column(
+        individual.diagonal_imbalance_ratio_threshold
+    )
 
-    return df
+    buy_imbalance_count = df[f"buy_imbalance_count_{threshold_name}"]
+    sell_imbalance_count = df[f"sell_imbalance_count_{threshold_name}"]
 
-# This part is to count the number of diagonal imbalances within the range of consecutive_up/down
-def add_imbalance_count_feature(df, threshold):
-    
-    threshold_name = format_threshold_for_column(threshold)
+    df["long_signal"] = (
+        (df["consecutive_up"] >= individual.min_impulse_candles)
+        & (df["impulse_duration_ms"] <= individual.max_duration_ms)
+        & (buy_imbalance_count >= individual.min_imbalance_count)
+    )
 
-    long_imbalance = df[f"is_imbalance_ratio_long_{threshold_name}"]
-    short_imbalance = df[f"is_imbalance_ratio_short_{threshold_name}"]
-
-    consecutive_up = df["consecutive_up"]
-    consecutive_down = df["consecutive_down"]
-
-    buy_imbalance_count_in_range = []
-    sell_imbalance_count_in_range = []
-
-    for i in range(len(df)):
-
-        buy_imbalance_count = 0
-        sell_imbalance_count = 0
-        
-        for j in range(int(consecutive_up.iloc[i])):
-            if long_imbalance.iloc[i - j]:
-                buy_imbalance_count += 1
-            
-        buy_imbalance_count_in_range.append(buy_imbalance_count)
-        
-        for j in range(int(consecutive_down.iloc[i])):
-            if short_imbalance.iloc[i - j]:
-                sell_imbalance_count += 1
-            
-        sell_imbalance_count_in_range.append(sell_imbalance_count)
-
-    df["buy_imbalance_count_in_range"] = buy_imbalance_count_in_range
-    df["sell_imbalance_count_in_range"] = sell_imbalance_count_in_range
-
-    return df
-
-def generate_long_signal(df, min_impulse_candles, max_duration_ms, min_imbalance_count):
-
-    consecutive_up = df["consecutive_up"] 
-    impulse_duration = df["impulse_duration_ms"]
-    long_imbalance_count_in_range = df["buy_imbalance_count_in_range"]
-
-    long_signal = []
-
-    for i in range(len(df)):
-        if (consecutive_up.iloc[i] >= min_impulse_candles 
-            and impulse_duration.iloc[i] <= max_duration_ms
-            and long_imbalance_count_in_range.iloc[i] >= min_imbalance_count):
-            long_signal.append(True)
-        else:
-            long_signal.append(False)
-    
-    df["long_signal"] = long_signal
-
-    return df
-
-def generate_short_signal(df, min_impulse_candles, max_duration_ms, min_imbalance_count):
-
-    consecutive_down = df["consecutive_down"] 
-    impulse_duration = df["impulse_duration_ms"]
-    short_imbalance_count_in_range = df["sell_imbalance_count_in_range"]
-
-    short_signal = []
-
-    for i in range(len(df)):
-        if (consecutive_down.iloc[i] >= min_impulse_candles 
-            and impulse_duration.iloc[i] <= max_duration_ms
-            and short_imbalance_count_in_range.iloc[i] >= min_imbalance_count):
-            short_signal.append(True)
-        else:
-            short_signal.append(False)
-    
-    df["short_signal"] = short_signal
+    df["short_signal"] = (
+        (df["consecutive_down"] >= individual.min_impulse_candles)
+        & (df["impulse_duration_ms"] <= individual.max_duration_ms)
+        & (sell_imbalance_count >= individual.min_imbalance_count)
+    )
 
     return df

@@ -18,7 +18,8 @@ from analysis.create_csv import create_csv
 from datetime import datetime
 
 print("Start of the program at:")
-print(datetime.now())
+start_time = datetime.now()
+print(start_time)
 
 NUMBER_OF_GENERATIONS = 10
 POPULATION_SIZE = 10
@@ -52,7 +53,7 @@ STEP_SIZE = ONE_DAY
 
 INITIAL_TRAIN_SIZE = ONE_DAY
 
-results_folder = Path("results")
+results_folder = Path("results_1")
 expanding_folder = results_folder / "expanding"
 rolling_folder = results_folder / "rolling"
 
@@ -127,4 +128,6 @@ for fitness_function in FITNESS_FUNCTIONS:
             create_csv(walk_forward_results, generation_train_results, generation_test_results, walk_forward_trades, generation_test_trades, repetition_folder)
 
 print("End of the program at:")
-print(datetime.now())
+end_time = datetime.now()
+print(end_time)
+print(f"total time: {end_time - start_time}")
