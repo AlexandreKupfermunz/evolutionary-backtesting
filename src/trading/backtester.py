@@ -7,12 +7,12 @@ slippage = SLIPPAGE_TICKS*TICK_SIZE
 
 def backtester(df, individual, maximum_holding_bars):
     
-    long_signal = df["long_signal"]
-    short_signal = df["short_signal"]
-    timestamp = df["timestamp"]
-    last = df["Last"]
-    high = df["High"]
-    low = df["Low"]
+    long_signal = df["long_signal"].to_numpy(dtype=int)
+    short_signal = df["short_signal"].to_numpy(dtype=int)
+    timestamp = df["timestamp"].to_numpy()
+    last = df["Last"].to_numpy(dtype=float)
+    high = df["High"].to_numpy(dtype=float)
+    low = df["Low"].to_numpy(dtype=float)
 
     trades = []
 
@@ -20,9 +20,9 @@ def backtester(df, individual, maximum_holding_bars):
 
     while i<len(df):
 
-        if long_signal.iloc[i]:
+        if long_signal[i] == 1:
 
-            entry_price = last.iloc[i] + slippage
+            entry_price = last[i] + slippage
             take_profit_price = entry_price + individual.take_profit_ticks * TICK_SIZE
             raw_stop_loss_price = entry_price - individual.stop_loss_ticks * TICK_SIZE
             stop_loss_exit_price = raw_stop_loss_price - slippage
@@ -31,7 +31,7 @@ def backtester(df, individual, maximum_holding_bars):
 
             for j in range(min(maximum_holding_bars, len(df) - i - 1)):
 
-                if (low.iloc[i+j+1] <= raw_stop_loss_price):
+                if (low[i+j+1] <= raw_stop_loss_price):
 
                     result = stop_loss_exit_price - entry_price
                     result_ticks = result / TICK_SIZE
@@ -39,7 +39,7 @@ def backtester(df, individual, maximum_holding_bars):
                     exit_index = i + j + 1
 
                     trades.append(Trade(i, exit_index, "long", entry_price, stop_loss_exit_price, 
-                                        "SL", timestamp.iloc[i], timestamp.iloc[exit_index], result_ticks))
+                                        "SL", timestamp[i], timestamp[exit_index], result_ticks))
                     
                     i = exit_index + 1
 
@@ -47,7 +47,7 @@ def backtester(df, individual, maximum_holding_bars):
 
                     break
                 
-                elif(high.iloc[i+j+1] >= take_profit_price):
+                elif(high[i+j+1] >= take_profit_price):
 
                     result = take_profit_price - entry_price
                     result_ticks = result / TICK_SIZE
@@ -55,7 +55,7 @@ def backtester(df, individual, maximum_holding_bars):
                     exit_index = i + j + 1
 
                     trades.append(Trade(i, exit_index, "long", entry_price, take_profit_price, 
-                                        "TP", timestamp.iloc[i], timestamp.iloc[exit_index], result_ticks))
+                                        "TP", timestamp[i], timestamp[exit_index], result_ticks))
                     
                     i = exit_index + 1
 
@@ -67,21 +67,21 @@ def backtester(df, individual, maximum_holding_bars):
                 
                 exit_index = min(i + maximum_holding_bars, len(df) - 1)
 
-                exit_price = last.iloc[exit_index] 
+                exit_price = last[exit_index] 
 
                 result = exit_price  - entry_price
                 result_ticks = result / TICK_SIZE
                 
                 trades.append(Trade(i, exit_index, "long", entry_price, exit_price,
-                    "max_holding_exit", timestamp.iloc[i], timestamp.iloc[exit_index], result_ticks))
+                    "max_holding_exit", timestamp[i], timestamp[exit_index], result_ticks))
                 
                 i = exit_index + 1
             
             
 
-        elif short_signal.iloc[i]:
+        elif short_signal[i] == 1:
             
-            entry_price = last.iloc[i] - slippage
+            entry_price = last[i] - slippage
             take_profit_price = entry_price - individual.take_profit_ticks * TICK_SIZE
             raw_stop_loss_price = entry_price + individual.stop_loss_ticks * TICK_SIZE
             stop_loss_exit_price = raw_stop_loss_price + slippage
@@ -90,7 +90,7 @@ def backtester(df, individual, maximum_holding_bars):
 
             for j in range(min(maximum_holding_bars, len(df) - i - 1)):
 
-                if(high.iloc[i+j+1] >= raw_stop_loss_price):
+                if(high[i+j+1] >= raw_stop_loss_price):
 
                     result = entry_price - stop_loss_exit_price
                     result_ticks = result / TICK_SIZE
@@ -98,7 +98,7 @@ def backtester(df, individual, maximum_holding_bars):
                     exit_index = i + j + 1
 
                     trades.append(Trade(i, exit_index, "short", entry_price, stop_loss_exit_price, 
-                                        "SL", timestamp.iloc[i], timestamp.iloc[exit_index], result_ticks))
+                                        "SL", timestamp[i], timestamp[exit_index], result_ticks))
                     
                     i = exit_index + 1
 
@@ -106,7 +106,7 @@ def backtester(df, individual, maximum_holding_bars):
 
                     break
                 
-                elif(low.iloc[i+j+1] <= take_profit_price):
+                elif(low[i+j+1] <= take_profit_price):
 
                     result = entry_price - take_profit_price
                     result_ticks = result / TICK_SIZE
@@ -114,7 +114,7 @@ def backtester(df, individual, maximum_holding_bars):
                     exit_index = i + j + 1
 
                     trades.append(Trade(i, exit_index, "short", entry_price, take_profit_price,
-                                        "TP", timestamp.iloc[i], timestamp.iloc[exit_index], result_ticks))
+                                        "TP", timestamp[i], timestamp[exit_index], result_ticks))
                     
                     i = exit_index + 1
 
@@ -125,13 +125,13 @@ def backtester(df, individual, maximum_holding_bars):
             if not trade_close:
 
                 exit_index = min(i + maximum_holding_bars, len(df) - 1)
-                exit_price = last.iloc[exit_index] 
+                exit_price = last[exit_index] 
 
                 result = entry_price - exit_price
                 result_ticks = result / TICK_SIZE
                 
                 trades.append(Trade(i, exit_index, "short", entry_price, exit_price,
-                        "max_holding_exit", timestamp.iloc[i], timestamp.iloc[exit_index], result_ticks))
+                        "max_holding_exit", timestamp[i], timestamp[exit_index], result_ticks))
                 
                 i = exit_index + 1
 

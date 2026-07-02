@@ -5,7 +5,7 @@ from src.ga.evolution import make_new_population
 from src.trading.backtester import backtester
 from src.ga.individual import copy_individual
 
-from fitness.performance import calculate_performance_metrics
+from src.fitness.performance import calculate_performance_metrics
 
 class WalkForwardWindow:
 
