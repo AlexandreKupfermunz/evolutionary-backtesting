@@ -1,5 +1,6 @@
 from src.trading.backtester import backtester
 from src.strategies.impulse_strategy import generate_impulse_signals
+from src.fitness.performance import calculate_performance_metrics
 
 import random
 
@@ -64,7 +65,8 @@ def create_initial_population(df, population_size, fitness_function, tick_value,
     for individual in population:
         signal_df = generate_impulse_signals(df, individual)
         trades = backtester(signal_df, individual, maximum_holding_bars)
-        fitness = fitness_function(trades, tick_value, commission)
+        performance_metrics = calculate_performance_metrics(trades, tick_value, commission)
+        fitness = fitness_function(performance_metrics)        
         individual.fitness = fitness
 
     return population
@@ -76,4 +78,6 @@ def copy_individual(individual):
                                  individual.min_imbalance_count, 
                                  individual.take_profit_ticks, 
                                  individual.stop_loss_ticks)
+    copy.fitness = individual.fitness
+    
     return copy

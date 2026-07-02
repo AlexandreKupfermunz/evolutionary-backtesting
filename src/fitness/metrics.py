@@ -22,16 +22,16 @@ def gross_profit(trades, tick_value, commission):
  
 def gross_loss(trades, tick_value, commission): 
 
-    total_loss = 0 
+    gross_loss = 0 
 
     for trade in trades:
 
         single_trade_profit = trade_profit(trade, tick_value, commission)
 
         if single_trade_profit < 0:
-            total_loss += abs(single_trade_profit)
+            gross_loss += abs(single_trade_profit)
 
-    return total_loss
+    return gross_loss
 
 def biggest_losing_streak(trades, tick_value, commission):
 
