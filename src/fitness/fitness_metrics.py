@@ -1,6 +1,4 @@
-from src.fitness.metrics import trade_profit
-
-class PerformanceMetrics:
+class FitnessMetrics:
 
     def __init__(
         self,
@@ -13,7 +11,7 @@ class PerformanceMetrics:
         win_rate,
         average_trade,
         biggest_loss,
-        biggest_losing_streak,
+        longest_losing_streak,
     ):
         self.number_of_trades = number_of_trades
         self.net_profit = net_profit
@@ -24,7 +22,7 @@ class PerformanceMetrics:
         self.win_rate = win_rate
         self.average_trade = average_trade
         self.biggest_loss = biggest_loss
-        self.biggest_losing_streak = biggest_losing_streak
+        self.longest_losing_streak = longest_losing_streak
 
     def to_dict(self):
 
@@ -38,10 +36,10 @@ class PerformanceMetrics:
             "win_rate": self.win_rate,
             "average_trade": self.average_trade,
             "biggest_loss": self.biggest_loss,
-            "biggest_losing_streak": self.biggest_losing_streak
+            "longest_losing_streak": self.longest_losing_streak
         })
 
-def calculate_performance_metrics(trades, tick_value, commission):
+def calculate_fitness_metrics(trades, tick_value, commission):
 
     net_profit = 0
     gross_profit = 0
@@ -60,7 +58,7 @@ def calculate_performance_metrics(trades, tick_value, commission):
     
     for trade in trades: 
 
-        single_trade_profit  = trade_profit(trade, tick_value, commission)
+        single_trade_profit  = trade.result * tick_value -commission
         
         ##net profit
         net_profit += single_trade_profit
@@ -121,7 +119,7 @@ def calculate_performance_metrics(trades, tick_value, commission):
     else:
         average_trade = 0
     
-    return PerformanceMetrics(
+    return FitnessMetrics(
         number_of_trades=number_of_trades,
         net_profit=net_profit,
         gross_profit=gross_profit,
@@ -131,5 +129,5 @@ def calculate_performance_metrics(trades, tick_value, commission):
         win_rate=win_rate,
         average_trade=average_trade,
         biggest_loss=biggest_loss,
-        biggest_losing_streak=max_losing_count
+        longest_losing_streak=max_losing_count
     )

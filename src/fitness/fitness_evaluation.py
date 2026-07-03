@@ -5,6 +5,6 @@ def evaluate_individual_on_df(df, individual, fitness_function, tick_value, comm
     
     signal_df = generate_signals(df.copy(), individual)
     trades = backtester(signal_df, individual, maximum_holding_bars)
-    fitness = fitness_function(trades, tick_value, commission)
+    fitness = fitness_function(fitness_metrics)
 
     return trades, fitness

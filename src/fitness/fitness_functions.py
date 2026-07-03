@@ -50,7 +50,7 @@ def robust_fitness(performance_metrics):
     profit = performance_metrics.net_profit
     drawdown = performance_metrics.max_drawdown
     win_rate_ratio = performance_metrics.win_rate
-    losing_streak = performance_metrics.biggest_losing_streak
+    losing_streak = performance_metrics.longest_losing_streak
 
     fitness = (profit*win_rate_ratio*math.sqrt(performance_metrics.number_of_trades))/((1 + drawdown)*math.sqrt(1 + losing_streak))
 

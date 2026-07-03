@@ -1,6 +1,45 @@
 import matplotlib.pyplot as plt
 from pathlib import Path
 
+def plot_ga_convergence(df, metric):
+
+    plt.figure(figsize=(10, 6))
+
+    title = f"{metric} convergence"
+
+    add_line(df, "generation", metric, label = metric)
+
+    save_plot(df, title, "convergence")
+
+def plot_train_vs_test(train_df, test_df, metric):
+
+    title = f"{metric} evolution train vs test"
+
+    add_line(train_df, "generation", metric, label = "Train")
+    add_line(test_df, "generation", metric, label = "Test")
+             
+    save_plot(train_df, title, "overfitting")
+
+def plot_metric_per_window(df, metric):
+
+    plt.figure(figsize=(10, 6))
+
+    title = f"{metric} per window"
+
+    add_line(df, "window", metric, label=metric)
+
+    save_plot(df, title, "window_metrics")
+
+def plot_arameter_evolution(df, parameter):
+
+    plt.figure(figsize=(10,6))
+
+    title=f"{parameter} evolution"
+
+    add_line(df, "generation", parameter, label=parameter)
+
+    save_plot(df, title, "parameters")
+
 def add_line(df, x_column, y_column, label):
 
     if df.empty:
@@ -27,37 +66,15 @@ def save_plot(df, title, output_folder):
     if train_size_name == None:
         train_size_name = ""
 
-    file_name = f"{title}_{walk_forward_type}_{fitness_function}_{train_size_name}_{repetition}_{csv_type}"
+    file_name = f"{replace_invalid_car(title)}_{walk_forward_type}_{fitness_function}_{train_size_name}_{repetition}_{csv_type}"
 
-    plot_path = build_plot_path(file_name, output_folder)
+    plot_path = get_plot_path(file_name, output_folder)
 
     plt.savefig(plot_path, format = "png")
 
     plt.close()
 
-def plot_ga_convergence(df, metric):
-
-    plt.figure(figsize=(10, 6))
-
-    title = f"{metric}_convergence"
-
-    add_line(df, "generation", metric, label = metric)
-
-    save_plot(df, title, "convergence")
-
-def plot_train_vs_test(train_df, test_df, metric):
-
-    title = f"{metric}_evolution_train_vs_test"
-
-    add_line(train_df, "generation", metric, label = "Train")
-    add_line(test_df, "generation", metric, label = "Test")
-             
-    save_plot(train_df, title, "overfitting")
-
-##plot_profit_factor_per_window(df)
-##plot_drawdown_per_window(df)
-
-def build_plot_path(file_name, output_folder): 
+def get_plot_path(file_name, output_folder): 
 
     path = Path("analysis")
 
@@ -91,7 +108,3 @@ def get_metadata(df):
     csv_type = df["csv_type"].iloc[0]
 
     return walk_forward_type, fitness_function, train_size_name, repetition, csv_type
-
-
-
-

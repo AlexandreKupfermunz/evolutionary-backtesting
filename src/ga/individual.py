@@ -1,8 +1,10 @@
 from src.trading.backtester import backtester
 from src.strategies.impulse_strategy import generate_impulse_signals
-from src.fitness.performance import calculate_performance_metrics
+from src.fitness.fitness_metrics import calculate_fitness_metrics
 
 import random
+
+import statistics
 
 THRESHOLD_RATIO_STEP = 0.25
 
@@ -65,8 +67,8 @@ def create_initial_population(df, population_size, fitness_function, tick_value,
     for individual in population:
         signal_df = generate_impulse_signals(df, individual)
         trades = backtester(signal_df, individual, maximum_holding_bars)
-        performance_metrics = calculate_performance_metrics(trades, tick_value, commission)
-        fitness = fitness_function(performance_metrics)        
+        fitness_metrics = calculate_fitness_metrics(trades, tick_value, commission)
+        fitness = fitness_function(fitness_metrics)        
         individual.fitness = fitness
 
     return population
@@ -81,3 +83,20 @@ def copy_individual(individual):
     copy.fitness = individual.fitness
     
     return copy
+
+def calculate_population_statistics(population):
+
+    fitness_values = []
+
+    for individual in population:
+        fitness_values.append(individual.fitness)
+
+    statistics_dict = {
+        "best_fitness": max(fitness_values),
+        "average_fitness": sum(fitness_values) / len(fitness_values),
+        "median_fitness": statistics.median(fitness_values),
+        "worst_fitness": min(fitness_values),
+        "std_fitness": statistics.stdev(fitness_values) if len(fitness_values) > 1 else 0
+    }
+
+    return statistics_dict

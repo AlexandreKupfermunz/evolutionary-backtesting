@@ -77,7 +77,7 @@ for fitness_function in FITNESS_FUNCTIONS:
         if len(windows) == 0:
             continue
 
-        walk_forward_results, generation_train_results, generation_test_results, walk_forward_trades, generation_test_trades  = run_walk_forward(df, 
+        walk_forward_results, walk_forward_trades, generation_train_results, generation_test_results = run_walk_forward(df, 
                                                                                                             windows, 
                                                                                                             NUMBER_OF_GENERATIONS, 
                                                                                                             POPULATION_SIZE, 
@@ -88,7 +88,7 @@ for fitness_function in FITNESS_FUNCTIONS:
                                                                                                             PATIENCE)
         
 
-        create_csv(walk_forward_results, generation_train_results, generation_test_results, walk_forward_trades, generation_test_trades, repetition_folder)
+        create_csv(walk_forward_results, walk_forward_trades, generation_train_results, generation_test_results, repetition_folder)
 
 ## rolling
 TRAIN_SIZES = {
@@ -117,7 +117,7 @@ for fitness_function in FITNESS_FUNCTIONS:
             if len(windows) == 0:
                 continue
 
-            walk_forward_results, generation_train_results, generation_test_results, walk_forward_trades, generation_test_trades  = run_walk_forward(df, 
+            walk_forward_results, walk_forward_trades, generation_train_results, generation_test_results = run_walk_forward(df, 
                                                                                                             windows, 
                                                                                                             NUMBER_OF_GENERATIONS, 
                                                                                                             POPULATION_SIZE, 
@@ -127,7 +127,7 @@ for fitness_function in FITNESS_FUNCTIONS:
                                                                                                             MAXIMUM_HOLDING_BARS, 
                                                                                                             PATIENCE)
             
-            create_csv(walk_forward_results, generation_train_results, generation_test_results, walk_forward_trades, generation_test_trades, repetition_folder)
+            create_csv(walk_forward_results, walk_forward_trades, generation_train_results, generation_test_results, repetition_folder)
 
 print("End of the program at:")
 end_time = datetime.now()
