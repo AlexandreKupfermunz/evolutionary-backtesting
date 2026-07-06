@@ -63,9 +63,11 @@ def profit_factor(trades):
     gross_loss_value = gross_loss(trades)
 
     if gross_loss_value == 0:
-        return float("inf")
+        return 10
 
-    return gross_profit_value / gross_loss_value
+    profit_factor = gross_profit_value / gross_loss_value
+
+    return min(10, profit_factor)
 
 def win_rate(trades):
 

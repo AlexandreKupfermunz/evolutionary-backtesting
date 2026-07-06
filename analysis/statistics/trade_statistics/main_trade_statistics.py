@@ -24,7 +24,6 @@ def add_trade_statistics(trades, tick_value, commission):
 
     return statistics
 
-
 def calculate_statistics_by_window(trades, tick_value, commission):
 
     if trades.empty:
@@ -46,7 +45,6 @@ def calculate_statistics_by_window(trades, tick_value, commission):
 
     return results_df.sort_values("window_id").reset_index(drop=True)
 
-
 def calculate_net_trade_profit(trades, tick_value, commission):
 
     df = trades.copy()
@@ -58,7 +56,6 @@ def calculate_net_trade_profit(trades, tick_value, commission):
     df["net_trade_profit"] = df["result"] * tick_value - commission
 
     return df
-
 
 def filter_by_direction(trades, direction):
 

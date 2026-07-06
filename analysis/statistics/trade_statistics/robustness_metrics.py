@@ -95,3 +95,12 @@ def kurtosis(trades):
         return 0
 
     return trades["net_trade_profit"].kurt()
+
+def Coefficient_of_variation(trades):
+
+    if trades["net_trade_profit"] == 0:
+        return 0
+
+    cv = std_trade(trades) / trades["net_trade_profit"].mean()
+
+    return cv
