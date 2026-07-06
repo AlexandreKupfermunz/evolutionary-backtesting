@@ -5,9 +5,9 @@ from src.ga.evolution import make_new_population
 from src.trading.backtester import backtester
 from src.ga.individual import copy_individual
 
-from src.fitness.fitness_metrics import calculate_fitness_metrics
+from src.ga.population_statistics import PopulationStatistics
 
-from src.ga.individual import calculate_population_statistics
+from src.fitness.fitness_metrics import calculate_fitness_metrics
 
 class WalkForwardWindow:
 
@@ -62,7 +62,7 @@ class GenerationResult:
         window,
         generation,
         best_individual,
-        metrics,
+        fitness_metrics,
         patience_counter,
         population_statistics
     ):
@@ -70,7 +70,7 @@ class GenerationResult:
         self.window = window
         self.generation = generation
         self.best_individual = best_individual
-        self.metrics = metrics
+        self.fitness_metrics = fitness_metrics
         self.patience_counter = patience_counter
         self.population_statistics = population_statistics
         
@@ -86,8 +86,8 @@ class GenerationResult:
 
         row.update(self.window.to_dict())
         row.update(self.best_individual.to_dict())
-        row.update(self.metrics.to_dict())
-        row.update(self.population_statistics)
+        row.update(self.fitness_metrics.to_dict())
+        row.update(self.population_statistics.to_dict())
         row.update({"patience_counter": self.patience_counter})
 
         return row
@@ -152,7 +152,7 @@ def run_walk_forward(df, windows, number_of_generations, population_size, fitnes
         test_df = df.iloc[window.test_start:window.test_end]
 
         population = create_initial_population(train_df, population_size, fitness_function, tick_value, commission, maximum_holding_bars)
-        population_statistics = calculate_population_statistics(population)
+        population_statistics = PopulationStatistics(population)
 
         current_best_individual = max(population, key=lambda individual: individual.fitness)
 
@@ -180,7 +180,7 @@ def run_walk_forward(df, windows, number_of_generations, population_size, fitnes
         for i in range(2, number_of_generations+1):
 
             population = make_new_population(train_df, population, fitness_function, tick_value, commission, maximum_holding_bars)
-            population_statistics = calculate_population_statistics(population)
+            population_statistics = PopulationStatistics(population)
 
             current_best_individual = max(population, key=lambda individual: individual.fitness)
 
@@ -265,9 +265,9 @@ def create_generation_result(dataset_type, window, generation, individual, trade
 
     individual_copy = copy_individual(individual)
 
-    metrics = calculate_fitness_metrics(trades, tick_value, commission)
+    fitness_metrics = calculate_fitness_metrics(trades, tick_value, commission)
 
-    trades_fitness = fitness_function(metrics)
+    trades_fitness = fitness_function(fitness_metrics)
     individual_copy.fitness = trades_fitness
 
     return GenerationResult(
@@ -275,7 +275,7 @@ def create_generation_result(dataset_type, window, generation, individual, trade
         window=window,
         generation=generation,
         best_individual=individual_copy,
-        metrics=metrics,
+        fitness_metrics=fitness_metrics,
         patience_counter=patience_counter,
         population_statistics=population_statistics,
     )

@@ -83,20 +83,3 @@ def copy_individual(individual):
     copy.fitness = individual.fitness
     
     return copy
-
-def calculate_population_statistics(population):
-
-    fitness_values = []
-
-    for individual in population:
-        fitness_values.append(individual.fitness)
-
-    statistics_dict = {
-        "best_fitness": max(fitness_values),
-        "average_fitness": sum(fitness_values) / len(fitness_values),
-        "median_fitness": statistics.median(fitness_values),
-        "worst_fitness": min(fitness_values),
-        "std_fitness": statistics.stdev(fitness_values) if len(fitness_values) > 1 else 0
-    }
-
-    return statistics_dict
