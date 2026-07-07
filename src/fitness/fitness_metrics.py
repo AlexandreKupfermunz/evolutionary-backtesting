@@ -9,7 +9,7 @@ class FitnessMetrics:
         profit_factor,
         max_drawdown,
         win_rate,
-        average_trade,
+        expectancy,
         biggest_loss,
         longest_losing_streak,
     ):
@@ -20,7 +20,7 @@ class FitnessMetrics:
         self.profit_factor = profit_factor
         self.max_drawdown = max_drawdown
         self.win_rate = win_rate
-        self.average_trade = average_trade
+        self.expectancy = expectancy
         self.biggest_loss = biggest_loss
         self.longest_losing_streak = longest_losing_streak
 
@@ -34,7 +34,7 @@ class FitnessMetrics:
             "profit_factor":self.profit_factor,
             "max_drawdown": self.max_drawdown,
             "win_rate": self.win_rate,
-            "average_trade": self.average_trade,
+            "expectancy": self.expectancy,
             "biggest_loss": self.biggest_loss,
             "longest_losing_streak": self.longest_losing_streak
         })
@@ -127,7 +127,7 @@ def calculate_fitness_metrics(trades, tick_value, commission):
         profit_factor=profit_factor,
         max_drawdown=max_drawdown,
         win_rate=win_rate,
-        average_trade=average_trade,
+        expectancy=average_trade,
         biggest_loss=biggest_loss,
         longest_losing_streak=max_losing_count
     )

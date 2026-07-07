@@ -1,8 +1,8 @@
 import pandas as pd
 
-from analysis.statistics.trade_statistics.performance_metrics import performance_summary
-from analysis.statistics.trade_statistics.risk_metrics import risk_summary
-from analysis.statistics.trade_statistics.robustness_metrics import robustness_summary
+from analysis.trade_analysis.performance_metrics import performance_summary
+from analysis.trade_analysis.risk_metrics import risk_summary
+from analysis.trade_analysis.robustness_metrics import robustness_summary
 
 
 def add_trade_statistics(trades, tick_value, commission):

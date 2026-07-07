@@ -58,13 +58,11 @@ class GenerationResult:
 
     def __init__(
         self,
-        dataset_type,
         window,
         generation,
         patience_counter,
         population_statistics
     ):
-        self.dataset_type = dataset_type
         self.window = window
         self.generation = generation
         self.patience_counter = patience_counter
@@ -75,11 +73,7 @@ class GenerationResult:
 
         row = {}
 
-        row.update({
-            "dataset_type": self.dataset_type,
-            "generation": self.generation,
-        })
-
+        row.update({"generation": self.generation})
         row.update(self.window.to_dict())
         row.update(self.population_statistics.to_dict())
         row.update({"patience_counter": self.patience_counter})
@@ -143,7 +137,7 @@ def create_expanding_walk_forward_windows(df_length, train_size, test_size, step
 
     number_of_windows = ((df_length - train_size - test_size) // step_size) + 1
 
-    window_id = 1
+    window_id = 0
     
     for i in range(number_of_windows):
 
@@ -181,27 +175,26 @@ def run_walk_forward(df, windows, number_of_generations, population_size, fitnes
         train_signal_df = generate_impulse_signals(train_df, current_best_individual)
         original_train_trades = backtester(train_signal_df, current_best_individual, maximum_holding_bars)
         
-        generation_results.append(create_generation_result("train", window, 1, 0, population_statistics))
-        generation_best_individuals.append(create_best_individual_result("train", window, 1, current_best_individual, original_train_trades, fitness_function, tick_value, commission))
+        generation_results.append(create_generation_result(window, 0, 0, population_statistics))
+        generation_best_individuals.append(create_best_individual_result("train", window, 0, current_best_individual, original_train_trades, fitness_function, tick_value, commission))
 
         test_signal_df = generate_impulse_signals(test_df, current_best_individual)
         original_test_trades = backtester(test_signal_df, current_best_individual, maximum_holding_bars)
 
-        generation_results.append(create_generation_result("test", window, 1, 0, population_statistics))
-        generation_best_individuals.append(create_best_individual_result("test", window, 1, current_best_individual, original_test_trades, fitness_function, tick_value, commission))
+        generation_best_individuals.append(create_best_individual_result("test", window, 0, current_best_individual, original_test_trades, fitness_function, tick_value, commission))
 
         original_train_metrics = calculate_fitness_metrics(original_train_trades, tick_value, commission)
         original_test_metrics = calculate_fitness_metrics(original_test_trades, tick_value, commission)
         original_test_fitness = fitness_function(original_test_metrics)
 
-        generation_print(1, current_best_individual, original_train_metrics, original_test_metrics, original_test_fitness)
+        generation_print(0, current_best_individual, original_train_metrics, original_test_metrics, original_test_fitness)
 
         generations_without_improvement = 0
         best_generation_so_far = 1
         best_fitness = current_best_individual.fitness
         best_individual_so_far = copy_individual(current_best_individual)
 
-        for i in range(2, number_of_generations+1):
+        for i in range(1, number_of_generations+1):
 
             population = make_new_population(train_df, population, fitness_function, tick_value, commission, maximum_holding_bars)
             population_statistics = PopulationStatistics(population)
@@ -219,13 +212,12 @@ def run_walk_forward(df, windows, number_of_generations, population_size, fitnes
             current_train_signal_df = generate_impulse_signals(train_df, current_best_individual)
             current_train_trades = backtester(current_train_signal_df, current_best_individual, maximum_holding_bars)
 
-            generation_results.append(create_generation_result("train", window, i, generations_without_improvement, population_statistics))
+            generation_results.append(create_generation_result(window, i, generations_without_improvement, population_statistics))
             generation_best_individuals.append(create_best_individual_result("train", window, i, current_best_individual, current_train_trades, fitness_function, tick_value, commission))
 
             current_test_signal_df = generate_impulse_signals(test_df, current_best_individual)
             current_test_trades = backtester(current_test_signal_df, current_best_individual, maximum_holding_bars)
 
-            generation_results.append(create_generation_result("test", window, i, generations_without_improvement, population_statistics))
             generation_best_individuals.append(create_best_individual_result("test", window, i, current_best_individual, current_test_trades, fitness_function, tick_value, commission))
 
             current_train_metrics = calculate_fitness_metrics(current_train_trades, tick_value, commission)
@@ -287,10 +279,9 @@ def generation_print(generation, individual, train_metrics, test_metrics, test_f
     print(f"Profit: {test_metrics.net_profit}")
     print("")
 
-def create_generation_result(dataset_type, window, generation, patience_counter, population_statistics):
+def create_generation_result(window, generation, patience_counter, population_statistics):
 
     return GenerationResult(
-        dataset_type=dataset_type,
         window=window,
         generation=generation,
         patience_counter=patience_counter,

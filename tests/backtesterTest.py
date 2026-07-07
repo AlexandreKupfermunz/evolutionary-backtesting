@@ -1,4 +1,4 @@
-from data.data_loader import load_data
+from data.helpers.data_loader import load_data
 from src.ga.individual import Individual
 from src.trading.backtester import backtester
 from src.trading.trade import tradePrinter

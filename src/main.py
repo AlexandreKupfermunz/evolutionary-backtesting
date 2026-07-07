@@ -1,7 +1,7 @@
 from pathlib import Path
 import pandas as pd
 
-from data.data_loader import load_data
+from data.helpers.data_loader import load_data
 
 from src.trading.walk_forward import create_rolling_walk_forward_windows
 from src.trading.walk_forward import create_expanding_walk_forward_windows

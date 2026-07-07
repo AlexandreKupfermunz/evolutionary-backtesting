@@ -1,4 +1,4 @@
-from analysis.statistics.trade_statistics.performance_metrics import performance_summary
+from analysis.trade_analysis.performance_metrics import performance_summary
 
 import pandas as pd
 

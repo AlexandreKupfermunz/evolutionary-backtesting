@@ -1,4 +1,4 @@
-from analysis.statistics.trade_statistics.main_trade_statistics import filter_by_direction
+from analysis.trade_analysis.main_trade_statistics import filter_by_direction
 
 def performance_summary(trades, long_trades, short_trades):
 

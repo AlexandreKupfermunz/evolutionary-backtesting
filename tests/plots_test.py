@@ -1,9 +1,9 @@
 from pathlib import Path
 
-from analysis.results_loader import load_all_csvs
+from data.helpers.results_loader import load_all_csvs
 
-from analysis.plot import plot_ga_convergence
-from analysis.plot import plot_train_vs_test
+from analysis.plots.plot import plot_ga_convergence
+from analysis.plots.plot import plot_train_vs_test
 
 
 results_folder = Path("results")
