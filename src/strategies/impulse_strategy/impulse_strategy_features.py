@@ -38,10 +38,12 @@ def add_volume_features(df):
 
 def add_timestamp_feature(df):
 
-    df["timestamp"] = pd.to_datetime(df["Date"] + " " + df["Time"], format="mixed")
+    df["timestamp"] = pd.to_datetime(
+        df["Date"].astype(str) + " " + df["Time"].astype(str),
+        errors="coerce"
+    )
 
     return df
-
 
 def add_impulse_features(df, max_gap_minutes=10):
 
@@ -63,8 +65,8 @@ def add_impulse_features(df, max_gap_minutes=10):
             time_gap = timestamps[i] - timestamps[i-1]
 
             if time_gap > max_gap:
-                consecutive_up = 0
-                consecutive_down = 0
+                consecutive_up_count = 0
+                consecutive_down_count = 0
 
         if up[i]==1:
             consecutive_down_count = 0
