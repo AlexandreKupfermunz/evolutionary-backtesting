@@ -9,7 +9,8 @@ def add_impulse_strategy_features(df):
 
     add_direction_features(df)
     add_volume_features(df)
-    add_impulse_features(df)
+    add_timestamp_feature(df)
+    add_impulse_features(df, max_gap_minutes=10)
     add_time_feature(df)
     precompute_imbalance_thresholds(df)
 
@@ -35,18 +36,36 @@ def add_volume_features(df):
 
     return df
 
-def add_impulse_features(df):
+def add_timestamp_feature(df):
+
+    df["timestamp"] = pd.to_datetime(df["Date"] + " " + df["Time"], format="mixed")
+
+    return df
+
+
+def add_impulse_features(df, max_gap_minutes=10):
 
     consecutive_up_count = 0
     consecutive_down_count = 0
 
     up = df["up"].to_numpy(dtype=int)
     down = df["down"].to_numpy(dtype=int)
+    timestamps = df["timestamp"].to_numpy()
+
+    max_gap = np.timedelta64(max_gap_minutes, "m")
 
     consecutive_up = []
     consecutive_down = []
     
     for i in range(len(up)):
+
+        if i > 0:
+            time_gap = timestamps[i] - timestamps[i-1]
+
+            if time_gap > max_gap:
+                consecutive_up = 0
+                consecutive_down = 0
+
         if up[i]==1:
             consecutive_down_count = 0
             consecutive_up_count += 1
@@ -69,8 +88,6 @@ def add_impulse_features(df):
     return df
 
 def add_time_feature(df):
-
-    df["timestamp"] = pd.to_datetime(df["Date"] + " " + df["Time"], format="mixed")
     
     consecutive_up = df["consecutive_up"].to_numpy(dtype=int)
     consecutive_down = df["consecutive_down"].to_numpy(dtype=int)
@@ -116,15 +133,9 @@ def precompute_imbalance_thresholds(df):
         long_imbalance = (df["diagonal_imbalance_ratio"] > threshold).to_numpy(dtype=int)
         short_imbalance = (df["diagonal_imbalance_ratio"] < 1 / threshold).to_numpy(dtype=int)
 
-        df[f"buy_imbalance_count_{threshold_name}"] = count_imbalances_in_impulse(
-            long_imbalance,
-            consecutive_up
-        )
+        df[f"buy_imbalance_count_{threshold_name}"] = count_imbalances_in_impulse(long_imbalance, consecutive_up)
 
-        df[f"sell_imbalance_count_{threshold_name}"] = count_imbalances_in_impulse(
-            short_imbalance,
-            consecutive_down
-        )
+        df[f"sell_imbalance_count_{threshold_name}"] = count_imbalances_in_impulse(short_imbalance, consecutive_down)
 
     return df
 

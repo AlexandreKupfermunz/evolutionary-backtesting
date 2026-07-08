@@ -1,4 +1,4 @@
-from src.features.impulse_strategy_features import format_threshold_for_column
+from src.strategies.impulse_strategy.impulse_strategy_features import format_threshold_for_column
 
 def generate_impulse_signals(df, individual):
     
