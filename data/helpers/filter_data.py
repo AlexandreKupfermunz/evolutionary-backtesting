@@ -4,16 +4,30 @@ def filter_trading_hours(df, sessions):
 
     df = df.copy()
 
-    df["Time"] = pd.to_datetime(df["Time"],format="mixed").dt.time
+    time_str = df["Time"]
 
-    candles = []
+    seconds = (
+        time_str.str[0:2].astype(int) * 3600
+        + time_str.str[3:5].astype(int) * 60
+        + time_str.str[6:8].astype(int)
+    )
+
+    mask = False
 
     for start_time, end_time in sessions:
+        
+        start_seconds = (
+            start_time.hour * 3600
+            + start_time.minute * 60
+            + start_time.second
+        )
 
-        session = df[(df["Time"] >= start_time) & (df["Time"] <= end_time)]
+        end_seconds = (
+            end_time.hour * 3600
+            + end_time.minute * 60
+            + end_time.second
+        )
 
-        candles.append(session)
+        mask |= (seconds >= start_seconds) & (seconds <= end_seconds)
 
-    df = pd.concat(candles)
-
-    return df
+    return df[mask]

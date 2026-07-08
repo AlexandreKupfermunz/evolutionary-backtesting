@@ -1,4 +1,3 @@
-from src.strategies.impulse_strategy.impulse_strategy_signals import generate_impulse_signals
 from src.ga.individual import create_initial_population
 from src.ga.evolution import make_new_population
 from src.trading.backtester import backtester
@@ -249,7 +248,18 @@ def create_expanding_walk_forward_windows_by_days(df, initial_train_days, test_d
 
     return windows
 
-def run_walk_forward(df, windows, number_of_generations, population_size, generate_strategy_signals, fitness_function, tick_value, commission, maximum_holding_bars, patience):
+def run_walk_forward(df, 
+                     windows, 
+                     number_of_generations, 
+                     population_size, 
+                     generate_strategy_signals, 
+                     fitness_function, 
+                     tick_value, 
+                     commission, 
+                     maximum_holding_bars, 
+                     patience,
+                     use_parallel=True,
+                     n_jobs=None):
 
     walk_forward_results = []
     walk_forward_trades = [] 
@@ -262,7 +272,7 @@ def run_walk_forward(df, windows, number_of_generations, population_size, genera
         train_df = df.iloc[window.train_start:window.train_end]
         test_df = df.iloc[window.test_start:window.test_end]
 
-        population = create_initial_population(train_df, population_size, generate_strategy_signals, fitness_function, tick_value, commission, maximum_holding_bars)
+        population = create_initial_population(train_df, population_size, generate_strategy_signals, fitness_function, tick_value, commission, maximum_holding_bars, use_parallel, n_jobs)
         population_statistics = PopulationStatistics(population)
 
         current_best_individual = max(population, key=lambda individual: individual.fitness)
@@ -291,7 +301,7 @@ def run_walk_forward(df, windows, number_of_generations, population_size, genera
 
         for i in range(1, number_of_generations+1):
 
-            population = make_new_population(train_df, population, generate_strategy_signals, fitness_function, tick_value, commission, maximum_holding_bars)
+            population = make_new_population(train_df, population, generate_strategy_signals, fitness_function, tick_value, commission, maximum_holding_bars, use_parallel, n_jobs)
             population_statistics = PopulationStatistics(population)
 
             current_best_individual = max(population, key=lambda individual: individual.fitness)
