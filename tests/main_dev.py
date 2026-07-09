@@ -60,9 +60,9 @@ for fitness_function in FITNESS_FUNCTIONS:
     windows = create_expanding_walk_forward_windows_by_days(df, INITIAL_TRAIN_DAYS, TEST_DAYS, STEP_DAYS)
 
     ## numbers of iterations
-    for i in range(1, NUMBER_OF_ITERATIONS+1):
+    for repetition in range(1, NUMBER_OF_ITERATIONS+1):
 
-        repetition_folder = fitness_function_path / f"rep_{i}"
+        repetition_folder = fitness_function_path / f"rep_{repetition}"
 
         repetition_folder.mkdir(parents=True, exist_ok=True)
         
@@ -78,7 +78,8 @@ for fitness_function in FITNESS_FUNCTIONS:
                                                                                                             TICK_VALUE, 
                                                                                                             COMMISSION, 
                                                                                                             MAXIMUM_HOLDING_BARS, 
-                                                                                                            PATIENCE)
+                                                                                                            PATIENCE,
+                                                                                                            repetition)
         
 
         create_csv(walk_forward_results, walk_forward_trades, generation_results, generation_best_individuals, repetition_folder)
@@ -101,9 +102,9 @@ for fitness_function in FITNESS_FUNCTIONS:
         windows = create_rolling_walk_forward_windows_by_days(df, train_days_size, TEST_DAYS, STEP_DAYS)
 
         ## numbers of iterations
-        for i in range(1, NUMBER_OF_ITERATIONS+1):
+        for repetition in range(1, NUMBER_OF_ITERATIONS+1):
 
-            repetition_folder = train_size_path / f"rep_{i}"
+            repetition_folder = train_size_path / f"rep_{repetition}"
 
             repetition_folder.mkdir(parents=True, exist_ok=True)
 
@@ -119,7 +120,8 @@ for fitness_function in FITNESS_FUNCTIONS:
                                                                                                             TICK_VALUE, 
                                                                                                             COMMISSION, 
                                                                                                             MAXIMUM_HOLDING_BARS, 
-                                                                                                            PATIENCE)
+                                                                                                            PATIENCE,
+                                                                                                            repetition)
             
             create_csv(walk_forward_results, walk_forward_trades, generation_results, generation_best_individuals, repetition_folder)
 

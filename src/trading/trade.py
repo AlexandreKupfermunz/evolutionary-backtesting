@@ -12,6 +12,7 @@ class Trade:
         self.result = result
         self.window = None
         self.generation = None
+        self.repetition_id = None
 
     def to_dict(self):
 
@@ -29,7 +30,8 @@ class Trade:
             "result": self.result
         })
         row.update(self.window.to_dict())
-        row.update({"generation": self.generation})
+        row.update({"generation": self.generation,
+                    "repetition_id": self.repetition_id})
 
         return row
 

@@ -258,6 +258,7 @@ def run_walk_forward(df,
                      commission, 
                      maximum_holding_bars, 
                      patience,
+                     repetition_id,
                      use_parallel=True,
                      n_jobs=None):
 
@@ -359,8 +360,9 @@ def run_walk_forward(df,
         for trade in test_trades:
             trade.window = window
             trade.generation = best_generation_so_far
+            trade.repetition_id = repetition_id
             walk_forward_trades.append(trade)
-            
+
 
         print(f"Best trained individual on test data:")
         best_individual_copy_for_test.print_parameters()

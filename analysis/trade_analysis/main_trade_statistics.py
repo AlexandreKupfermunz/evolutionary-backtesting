@@ -3,6 +3,7 @@ import pandas as pd
 from analysis.trade_analysis.performance_metrics import performance_summary
 from analysis.trade_analysis.risk_metrics import risk_summary
 from analysis.trade_analysis.robustness_metrics import robustness_summary
+from analysis.trade_analysis.walk_forward_stability_metrics import walk_forward_stability_summary
 
 
 def add_trade_statistics(trades, tick_value, commission):
@@ -15,12 +16,14 @@ def add_trade_statistics(trades, tick_value, commission):
     performance = performance_summary(trades, long_trades, short_trades)
     risk = risk_summary(trades)
     robustness = robustness_summary(trades, long_trades, short_trades)
+    stability = walk_forward_stability_summary(trades)
 
     statistics = {}
 
     statistics.update(performance)
     statistics.update(risk)
     statistics.update(robustness)
+    statistics.update(stability)
 
     return statistics
 

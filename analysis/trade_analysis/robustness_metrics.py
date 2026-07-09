@@ -21,6 +21,7 @@ def robustness_summary(trades, long_trades, short_trades):
     "short_profit_share": profit_share(short_trades, total_profit),
     "skewness": skewness(trades),
     "kurtosis": kurtosis(trades),
+    "coefficient_of_variation": coefficient_of_variation(trades)
     }
 
 def median_trade(trades):
@@ -38,10 +39,16 @@ def std_trade(trades):
     return trades["net_trade_profit"].std()
 
 def first_quartile(trades):
+    
+    if trades.empty:
+        return 0
 
     return trades["net_trade_profit"].quantile(0.25)
 
 def third_quartile(trades):
+
+    if trades.empty:
+        return 0
 
     return trades["net_trade_profit"].quantile(0.75)
 
@@ -96,11 +103,14 @@ def kurtosis(trades):
 
     return trades["net_trade_profit"].kurt()
 
-def Coefficient_of_variation(trades):
+def coefficient_of_variation(trades):
 
-    if trades["net_trade_profit"] == 0:
+    if trades.empty:
         return 0
 
-    cv = std_trade(trades) / trades["net_trade_profit"].mean()
+    mean = trades["net_trade_profit"].mean()
 
-    return cv
+    if mean == 0:
+        return 0
+
+    return std_trade(trades) / mean

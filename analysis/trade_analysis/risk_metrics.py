@@ -120,7 +120,8 @@ def recovery_factor(trades):
     return recovery_factor
 
 def biggest_loss(trades):
+    
+    if trades.empty:
+        return 0
 
-    biggest_loss = trades["net_trade_profit"].min()
-
-    return abs(biggest_loss)
+    return abs(trades["net_trade_profit"].min())
