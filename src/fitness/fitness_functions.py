@@ -7,7 +7,7 @@ def net_profit_fitness(performance_metrics):
 
 def expectancy_fitness(performance_metrics):
 
-    return performance_metrics.average_trade
+    return performance_metrics.expectancy
 
 def drawdown_adjusted_fitness(performance_metrics):
 

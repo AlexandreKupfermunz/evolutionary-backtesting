@@ -66,3 +66,41 @@ def filter_by_direction(trades, direction):
         return trades
 
     return trades[trades["direction"] == direction]
+
+def calculate_statistics_by_repetition(trades, tick_value, commission):
+
+    if trades.empty:
+        return pd.DataFrame()
+
+    results = []
+
+    grouped_trades = trades.groupby("repetition_id")
+
+    for repetition_id, repetition_trades in grouped_trades:
+
+        statistics = add_trade_statistics(repetition_trades, tick_value, commission)
+        statistics["repetition_id"] = repetition_id
+
+        results.append(statistics)
+
+    return pd.DataFrame(results).sort_values("repetition_id").reset_index(drop=True)
+
+def calculate_statistics_by_repetition_and_window(trades, tick_value, commission):
+
+    if trades.empty:
+        return pd.DataFrame()
+
+    results = []
+
+    grouped_trades = trades.groupby(["repetition_id", "window_id"])
+
+    for (repetition_id, window_id), grouped_window_trades in grouped_trades:
+
+        statistics = add_trade_statistics(grouped_window_trades, tick_value, commission)
+
+        statistics["repetition_id"] = repetition_id
+        statistics["window_id"] = window_id
+
+        results.append(statistics)
+
+    return pd.DataFrame(results).sort_values(["repetition_id", "window_id"]).reset_index(drop=True)
