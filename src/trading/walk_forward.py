@@ -3,6 +3,12 @@ from src.ga.evolution import make_new_population
 from src.trading.backtester import backtester
 from src.ga.individual import copy_individual
 
+from src.fitness.fitness_functions import net_profit_fitness
+from src.fitness.fitness_functions import expectancy_fitness
+from src.fitness.fitness_functions import drawdown_adjusted_fitness
+from src.fitness.fitness_functions import losing_streak_fitness
+from src.fitness.fitness_functions import robust_fitness
+
 from src.ga.population_statistics import PopulationStatistics
 
 from src.fitness.fitness_metrics import calculate_fitness_metrics
@@ -28,14 +34,20 @@ class WalkForwardWindow:
 
 class WalkForwardResult:
 
-    def __init__(self, 
-                window,
-                best_individual,
-                test_fitness,
-                test_metrics):  
+    def __init__(
+        self,
+        window,
+        best_individual,
+        raw_test_fitness,
+        test_fitness,
+        test_fitness_multiplier,
+        test_metrics
+    ):
         self.window = window
         self.best_individual = best_individual
+        self.raw_test_fitness = raw_test_fitness
         self.test_fitness = test_fitness
+        self.test_fitness_multiplier = test_fitness_multiplier
         self.test_metrics = test_metrics
 
     def to_dict(self):
@@ -46,10 +58,14 @@ class WalkForwardResult:
 
         row.update(self.best_individual.to_dict())
 
-        row.update({"test_fitness": self.test_fitness})
+        row.update({
+            "raw_test_fitness": self.raw_test_fitness,
+            "test_fitness": self.test_fitness,
+            "test_fitness_multiplier": self.test_fitness_multiplier
+        })
 
         row.update(self.test_metrics.to_dict())
-        
+
         return row
 
 class GenerationResult:
@@ -248,6 +264,49 @@ def create_expanding_walk_forward_windows_by_days(df, initial_train_days, test_d
 
     return windows
 
+def calculate_test_fitness_multiplier( train_df, test_df, date_column="Date"):
+
+    train_days = train_df[date_column].nunique()
+    test_days = test_df[date_column].nunique()
+
+    if train_days == 0:
+        raise ValueError("The training dataset contains no trading days.")
+
+    if test_days == 0:
+        raise ValueError("The testing dataset contains no trading days.")
+
+    multiplier = train_days / test_days
+
+    return multiplier
+
+def adjust_test_fitness(
+    raw_test_fitness,
+    multiplier,
+    fitness_function,
+    performance_metrics
+):
+    
+    if performance_metrics.number_of_trades == 0:
+        return raw_test_fitness
+
+    if fitness_function is expectancy_fitness:
+        return raw_test_fitness
+
+    if fitness_function is losing_streak_fitness:
+        return raw_test_fitness * multiplier ** 1.5
+
+    if fitness_function in {
+        net_profit_fitness,
+        drawdown_adjusted_fitness,
+        robust_fitness,
+    }:
+        return raw_test_fitness * multiplier
+
+    raise ValueError(
+        f"No test-fitness adjustment defined for "
+        f"{fitness_function.__name__}"
+    )
+
 def run_walk_forward(df, 
                      windows, 
                      number_of_generations, 
@@ -259,8 +318,9 @@ def run_walk_forward(df,
                      maximum_holding_bars, 
                      patience,
                      repetition_id,
-                     use_parallel=True,
-                     n_jobs=None):
+                     use_parallel=False,
+                     n_jobs=None,
+                     progress_callback=None):
 
     walk_forward_results = []
     walk_forward_trades = [] 
@@ -272,6 +332,8 @@ def run_walk_forward(df,
 
         train_df = df.iloc[window.train_start:window.train_end]
         test_df = df.iloc[window.test_start:window.test_end]
+
+        test_fitness_multiplier = calculate_test_fitness_multiplier( train_df=train_df, test_df=test_df, date_column="Date")
 
         population = create_initial_population(train_df, population_size, generate_strategy_signals, fitness_function, tick_value, commission, maximum_holding_bars, use_parallel, n_jobs)
         population_statistics = PopulationStatistics(population)
@@ -287,16 +349,17 @@ def run_walk_forward(df,
         test_signal_df = generate_strategy_signals(test_df, current_best_individual)
         original_test_trades = backtester(test_signal_df, current_best_individual, maximum_holding_bars)
 
-        generation_best_individuals.append(create_best_individual_result("test", window, 0, current_best_individual, original_test_trades, fitness_function, tick_value, commission))
+        generation_best_individuals.append(create_best_individual_result("test", window, 0, current_best_individual, original_test_trades, fitness_function, tick_value, commission, test_fitness_multiplier))
 
         original_train_metrics = calculate_fitness_metrics(original_train_trades, tick_value, commission)
         original_test_metrics = calculate_fitness_metrics(original_test_trades, tick_value, commission)
-        original_test_fitness = fitness_function(original_test_metrics)
-
+        original_raw_test_fitness = fitness_function(original_test_metrics)
+        original_test_fitness = adjust_test_fitness(original_raw_test_fitness, test_fitness_multiplier, fitness_function, original_test_metrics)
+        
         generation_print(0, current_best_individual, original_train_metrics, original_test_metrics, original_test_fitness)
 
         generations_without_improvement = 0
-        best_generation_so_far = 1
+        best_generation_so_far = 0
         best_fitness = current_best_individual.fitness
         best_individual_so_far = copy_individual(current_best_individual)
 
@@ -324,11 +387,12 @@ def run_walk_forward(df,
             current_test_signal_df = generate_strategy_signals(test_df, current_best_individual)
             current_test_trades = backtester(current_test_signal_df, current_best_individual, maximum_holding_bars)
 
-            generation_best_individuals.append(create_best_individual_result("test", window, i, current_best_individual, current_test_trades, fitness_function, tick_value, commission))
+            generation_best_individuals.append(create_best_individual_result("test", window, i, current_best_individual, current_test_trades, fitness_function, tick_value, commission, test_fitness_multiplier))
 
             current_train_metrics = calculate_fitness_metrics(current_train_trades, tick_value, commission)
             current_test_metrics = calculate_fitness_metrics(current_test_trades, tick_value, commission)
-            test_fitness = fitness_function(current_test_metrics)
+            raw_test_fitness = fitness_function(current_test_metrics)
+            test_fitness = adjust_test_fitness(raw_test_fitness, test_fitness_multiplier, fitness_function, current_test_metrics)
 
             if generations_without_improvement >= patience:
 
@@ -348,14 +412,18 @@ def run_walk_forward(df,
 
         test_metrics = calculate_fitness_metrics(test_trades, tick_value, commission)
 
-        test_fitness = fitness_function(test_metrics)
+        raw_test_fitness = fitness_function(test_metrics)
 
-        best_individual_copy_for_test.fitness = test_fitness
+        test_fitness = adjust_test_fitness(raw_test_fitness, test_fitness_multiplier, fitness_function, test_metrics)
+
+        best_individual_copy_for_test.fitness = test_fitness 
 
         walk_forward_results.append(WalkForwardResult(window = window, 
-                                         best_individual = best_individual_copy_for_test, 
-                                         test_fitness = test_fitness,
-                                         test_metrics = test_metrics))
+                                        best_individual = best_individual_copy_for_test, 
+                                        raw_test_fitness = raw_test_fitness,
+                                        test_fitness = test_fitness,
+                                        test_fitness_multiplier = test_fitness_multiplier,
+                                        test_metrics = test_metrics))
         
         for trade in test_trades:
             trade.window = window
@@ -363,6 +431,8 @@ def run_walk_forward(df,
             trade.repetition_id = repetition_id
             walk_forward_trades.append(trade)
 
+        if progress_callback is not None:
+            progress_callback()
 
         print(f"Best trained individual on test data:")
         best_individual_copy_for_test.print_parameters()
@@ -395,14 +465,20 @@ def create_generation_result(window, generation, patience_counter, population_st
         population_statistics=population_statistics,
     )
 
-def create_best_individual_result(dataset_type, window, generation, individual, trades, fitness_function, tick_value, commission):
+def create_best_individual_result(dataset_type, window, generation, individual, trades, fitness_function, tick_value, commission, fitness_multiplier=1.0):
 
     individual_copy = copy_individual(individual)
 
     fitness_metrics = calculate_fitness_metrics(trades, tick_value, commission)
 
-    trades_fitness = fitness_function(fitness_metrics)
-    individual_copy.fitness = trades_fitness
+    raw_fitness = fitness_function(fitness_metrics)
+
+    if dataset_type == "test":
+        result_fitness = adjust_test_fitness(raw_fitness, fitness_multiplier, fitness_function, fitness_metrics)
+    else:
+        result_fitness = raw_fitness
+
+    individual_copy.fitness = result_fitness
 
     return BestIndividualResults(
         dataset_type=dataset_type,
