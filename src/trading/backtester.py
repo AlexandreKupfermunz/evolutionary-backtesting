@@ -7,12 +7,12 @@ slippage = SLIPPAGE_TICKS*TICK_SIZE
 
 def backtester(df, individual, maximum_holding_bars):
     
-    long_signal = df["long_signal"].to_numpy(dtype=int)
-    short_signal = df["short_signal"].to_numpy(dtype=int)
-    timestamp = df["timestamp"].to_numpy()
-    last = df["Last"].to_numpy(dtype=float)
-    high = df["High"].to_numpy(dtype=float)
-    low = df["Low"].to_numpy(dtype=float)
+    long_signal = df["long_signal"].to_numpy(dtype=int, copy=False)
+    short_signal = df["short_signal"].to_numpy(dtype=int, copy=False)
+    timestamp = df["timestamp"].to_numpy(copy=False)
+    last = df["Last"].to_numpy(dtype=float, copy=False)
+    high = df["High"].to_numpy(dtype=float, copy=False)
+    low = df["Low"].to_numpy(dtype=float, copy=False)
 
     trades = []
 
