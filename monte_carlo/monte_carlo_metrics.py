@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class MonteCarloTradeMetrics:
+class MonteCarloMetrics:
 
     def __init__(self, max_drawdown, net_profit, number_of_trades, win_rate, expectancy, gross_profit, gross_loss, profit_factor, recovery_factor, longest_losing_streak):
         
@@ -15,7 +15,7 @@ class MonteCarloTradeMetrics:
         self.profit_factor = profit_factor
         self.recovery_factor = recovery_factor
         self.longest_losing_streak = longest_losing_streak
-        self.repetition_id = None
+        self.simulation_id = None
 
     def to_dict(self):
         return {
@@ -29,7 +29,7 @@ class MonteCarloTradeMetrics:
             "profit_factor": self.profit_factor,
             "recovery_factor": self.recovery_factor,
             "longest_losing_streak": self.longest_losing_streak,
-            "repetition_id": self.repetition_id,
+            "simulation_id": self.simulation_id,
         }
 
 def validate_results(results):
@@ -172,7 +172,7 @@ def calculate_trade_metrics(results):
 
     results = validate_results(results)
 
-    return MonteCarloTradeMetrics(
+    return MonteCarloMetrics(
         max_drawdown=max_drawdown(results),
         net_profit=net_profit(results),
         number_of_trades=number_of_trades(results),
