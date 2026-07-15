@@ -2,20 +2,26 @@ import math
 
 def net_profit_fitness(performance_metrics):
 
+    if performance_metrics.number_of_trades < 10:
+        return -100
+
     return performance_metrics.net_profit
 
 
 def expectancy_fitness(performance_metrics):
+
+    if performance_metrics.number_of_trades < 10:
+        return -100
 
     return performance_metrics.expectancy
 
 def drawdown_adjusted_fitness(performance_metrics):
 
     profit = performance_metrics.net_profit
-    max_drawdown = performance_metrics.max_drawdown
+    max_drawdown = abs(performance_metrics.max_drawdown)
     number_of_trades = performance_metrics.number_of_trades
 
-    if number_of_trades == 0:
+    if number_of_trades < 10:
         return -100
 
     fitness = (profit*math.sqrt(number_of_trades)) / max(1,max_drawdown)
@@ -29,7 +35,7 @@ def losing_streak_fitness(performance_metrics):
     losing_streak = performance_metrics.longest_losing_streak
     number_of_trades = performance_metrics.number_of_trades
 
-    if number_of_trades == 0:
+    if number_of_trades < 10:
         return -100
 
     fitness = (profit*math.sqrt(number_of_trades)) / max(1,losing_streak)
@@ -39,13 +45,18 @@ def losing_streak_fitness(performance_metrics):
 def robust_fitness(performance_metrics):
 
     profit = performance_metrics.net_profit
-    max_drawdown = performance_metrics.max_drawdown
+    max_drawdown = abs(performance_metrics.max_drawdown)
     losing_streak = performance_metrics.longest_losing_streak
     number_of_trades = performance_metrics.number_of_trades
 
-    if number_of_trades == 0:
+    if number_of_trades < 10:
         return -100
 
-    fitness = (profit*math.sqrt(number_of_trades)) / max(1,losing_streak*max_drawdown)
+    normalized_drawdown = max_drawdown / max(abs(profit), 1)
+    normalized_losing_streak = losing_streak / number_of_trades
+
+    risk_penalty = normalized_drawdown + normalized_losing_streak
+
+    fitness = (profit * math.sqrt(number_of_trades)) / (1 + risk_penalty)
 
     return fitness
