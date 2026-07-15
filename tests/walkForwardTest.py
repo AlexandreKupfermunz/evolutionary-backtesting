@@ -1,6 +1,6 @@
 from data.helpers.data_loader import load_data
-from src.trading.walk_forward import create_rolling_walk_forward_windows
-from src.trading.walk_forward import run_walk_forward
+from trading.walk_forward.walk_forward import create_rolling_walk_forward_windows
+from trading.walk_forward.walk_forward import run_walk_forward
 
 from src.fitness.fitness_functions import net_profit_fitness
 from src.fitness.fitness_functions import expectancy_fitness

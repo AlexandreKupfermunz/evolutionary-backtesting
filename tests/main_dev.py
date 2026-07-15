@@ -8,9 +8,9 @@ from datetime import time
 from src.strategies.impulse_strategy.impulse_strategy_features import add_impulse_strategy_features
 from src.strategies.impulse_strategy.impulse_strategy_signals import generate_impulse_signals
 
-from src.trading.walk_forward import create_rolling_walk_forward_windows_by_days
-from src.trading.walk_forward import create_expanding_walk_forward_windows_by_days
-from src.trading.walk_forward import run_walk_forward
+from trading.walk_forward.walk_forward import create_rolling_walk_forward_windows_by_days
+from trading.walk_forward.walk_forward import create_expanding_walk_forward_windows_by_days
+from trading.walk_forward.walk_forward import run_walk_forward
 
 from src.fitness.fitness_functions import net_profit_fitness
 from src.fitness.fitness_functions import expectancy_fitness

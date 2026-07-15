@@ -5,15 +5,6 @@ import matplotlib.pyplot as plt
 
 
 def load_all_walk_forward_results(results_folder_path):
-    """
-    Loads all walk_forward_results.csv files from the results folder.
-
-    Returns one combined dataframe with extra columns:
-    - walk_forward_type
-    - fitness_function
-    - train_size
-    - repetition
-    """
 
     results_folder = Path(results_folder_path)
     all_rows = []
@@ -85,9 +76,6 @@ def load_all_walk_forward_results(results_folder_path):
 
 
 def summarize_group(df, group_columns):
-    """
-    Creates a summary table for out-of-sample performance.
-    """
 
     summary = (
         df.groupby(group_columns)
@@ -146,11 +134,6 @@ def create_configuration_summary(df):
 
 
 def create_configuration_average_summary(df):
-    """
-    Same as configuration summary, but averages repetitions together.
-
-    This is usually the best table for the final dissertation ranking.
-    """
 
     summary = summarize_group(
         df,
@@ -168,6 +151,7 @@ def create_configuration_average_summary(df):
 
 
 def plot_bar(summary_df, x_column, y_column, title, ylabel, output_path):
+
     plt.figure(figsize=(10, 6))
 
     plt.bar(summary_df[x_column], summary_df[y_column])
@@ -184,6 +168,7 @@ def plot_bar(summary_df, x_column, y_column, title, ylabel, output_path):
 
 
 def plot_walk_forward_comparison(walk_forward_summary, output_folder):
+
     plot_bar(
         summary_df=walk_forward_summary,
         x_column="walk_forward_type",
@@ -195,6 +180,7 @@ def plot_walk_forward_comparison(walk_forward_summary, output_folder):
 
 
 def plot_fitness_function_comparison(fitness_summary, output_folder):
+
     plot_bar(
         summary_df=fitness_summary,
         x_column="fitness_function",
@@ -206,6 +192,7 @@ def plot_fitness_function_comparison(fitness_summary, output_folder):
 
 
 def plot_train_size_comparison(train_size_summary, output_folder):
+
     plot_bar(
         summary_df=train_size_summary,
         x_column="train_size",
@@ -217,6 +204,7 @@ def plot_train_size_comparison(train_size_summary, output_folder):
 
 
 def create_configuration_label(row):
+
     return (
         str(row["walk_forward_type"])
         + " | "
@@ -227,6 +215,7 @@ def create_configuration_label(row):
 
 
 def plot_configuration_ranking(configuration_average_summary, output_folder):
+    
     df = configuration_average_summary.copy()
 
     df["configuration"] = df.apply(create_configuration_label, axis=1)
@@ -247,6 +236,7 @@ def plot_configuration_ranking(configuration_average_summary, output_folder):
 
 
 def plot_profit_vs_drawdown(configuration_average_summary, output_folder):
+
     df = configuration_average_summary.copy()
     df["configuration"] = df.apply(create_configuration_label, axis=1)
 
@@ -272,9 +262,6 @@ def plot_profit_vs_drawdown(configuration_average_summary, output_folder):
 
 
 def find_best_configuration(configuration_average_summary):
-    """
-    Finds the best configuration based on mean test fitness.
-    """
 
     if configuration_average_summary.empty:
         return None
@@ -295,13 +282,6 @@ def find_best_configuration(configuration_average_summary):
 
 
 def run_window_analysis(results_folder_path, output_folder_path):
-    """
-    Main function for window analysis.
-
-    This answers:
-    Which walk-forward method, fitness function, and train size gives
-    the best out-of-sample result?
-    """
 
     output_folder = Path(output_folder_path)
     output_folder.mkdir(parents=True, exist_ok=True)
