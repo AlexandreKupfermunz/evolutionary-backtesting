@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
+from math import isfinite
 
 from core.config.result_configuration import (
     ResultConfiguration,
@@ -28,6 +29,8 @@ class MonteCarloConfig:
     number_of_equity_curves_to_plot: int = 100
     histogram_bins: int = 30
     result_column: str = "result"
+    tick_value: float = 5.0
+    commission: float = 4.0
 
     # =========================================================
     # Initialization and validation
@@ -158,6 +161,57 @@ class MonteCarloConfig:
             raise TypeError(
                 "random_seed must be an integer."
             )
+
+        # Convert the selected cost values to floats.
+        try:
+            self.tick_value = float(
+                self.tick_value
+            )
+
+            self.commission = float(
+                self.commission
+            )
+
+        except (
+            TypeError,
+            ValueError,
+        ) as error:
+            raise TypeError(
+                "tick_value and commission "
+                "must be numeric values."
+            ) from error
+
+        if not isfinite(
+            self.tick_value
+        ):
+            raise ValueError(
+                "tick_value must be a finite value."
+            )
+
+        if not isfinite(
+            self.commission
+        ):
+            raise ValueError(
+                "commission must be a finite value."
+            )
+
+        if self.tick_value <= 0:
+            raise ValueError(
+                "tick_value must be greater "
+                "than zero."
+            )
+
+        if self.commission < 0:
+            raise ValueError(
+                "commission cannot be negative."
+            )
+
+        self.result_column = (
+            str(
+                self.result_column
+            )
+            .strip()
+        )
 
         self.result_column = (
             str(

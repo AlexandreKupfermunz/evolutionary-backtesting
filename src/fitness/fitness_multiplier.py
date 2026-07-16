@@ -4,7 +4,7 @@ from src.fitness.fitness_functions import drawdown_adjusted_fitness
 from src.fitness.fitness_functions import losing_streak_fitness
 from src.fitness.fitness_functions import robust_fitness
 
-MINIMUM_NUMBER_OF_TRADES = 10
+MINIMUM_NUMBER_OF_TRADES = 5
 
 def calculate_test_fitness_multiplier( train_df, test_df, date_column="Date"):
 
@@ -23,18 +23,20 @@ def calculate_test_fitness_multiplier( train_df, test_df, date_column="Date"):
 
 def adjust_test_fitness(raw_test_fitness, multiplier, fitness_function, performance_metrics):
     
-    if performance_metrics.number_of_trades < MINIMUM_NUMBER_OF_TRADES:
-        return raw_test_fitness
 
     if fitness_function is expectancy_fitness:
         return raw_test_fitness
+    
+    if fitness_function is net_profit_fitness:
+        return raw_test_fitness * multiplier
 
     if fitness_function in {
-        net_profit_fitness,
         drawdown_adjusted_fitness,
         losing_streak_fitness,
         robust_fitness,
     }:
+        if performance_metrics.number_of_trades < MINIMUM_NUMBER_OF_TRADES:
+            return raw_test_fitness
         return raw_test_fitness * multiplier
 
     raise ValueError(

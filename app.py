@@ -2860,6 +2860,62 @@ with monte_carlo_tab:
                 )
 
         # -----------------------------------------------------
+        # Trade-cost parameters
+        # -----------------------------------------------------
+
+        with st.expander(
+            "Trade Costs",
+            expanded=True,
+        ):
+
+            cost_columns = st.columns(2)
+
+            with cost_columns[0]:
+
+                monte_carlo_tick_value = (
+                    st.number_input(
+                        "Tick value",
+                        min_value=0.01,
+                        value=5.0,
+                        step=0.25,
+                        format="%.2f",
+                        key=(
+                            "monte_carlo_"
+                            "tick_value"
+                        ),
+                        help=(
+                            "Money value of one tick. "
+                            "For NQ, one tick is normally $5."
+                        ),
+                    )
+                )
+
+            with cost_columns[1]:
+
+                monte_carlo_commission = (
+                    st.number_input(
+                        "Commission per completed trade",
+                        min_value=0.0,
+                        value=4.0,
+                        step=0.25,
+                        format="%.2f",
+                        key=(
+                            "monte_carlo_"
+                            "commission"
+                        ),
+                        help=(
+                            "Commission deducted once from "
+                            "every completed trade."
+                        ),
+                    )
+                )
+
+            st.caption(
+                "Each Monte Carlo trade will be converted with: "
+                "result in ticks × tick value − commission."
+            )
+
+        # -----------------------------------------------------
         # Exact configuration selection
         # -----------------------------------------------------
 

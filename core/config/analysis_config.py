@@ -62,8 +62,6 @@ class AnalysisConfig:
         if self.configurations is None:
             self.configurations = []
 
-        if self.selected_repetitions is None:
-            self.selected_repetitions = []
 
     # =========================================================
     # Paths

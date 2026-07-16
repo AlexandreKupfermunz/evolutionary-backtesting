@@ -346,7 +346,7 @@ def run_configuration_generation_analysis(
         exist_ok=True,
     )
 
-    filtered_generation_results_df = generation_results_df.copy
+    filtered_generation_results_df = generation_results_df.copy()
 
     best_so_far_df = create_best_so_far_df(
         generation_best_individuals_df
@@ -631,14 +631,7 @@ def run_global_generation_overfitting_analysis(
         if best_individuals_group.empty:
             continue
 
-        configuration_output_folder = (
-            create_configuration_folder(
-                output_folder=output_folder,
-                walk_forward_type=walk_forward_type,
-                fitness_function=fitness_function,
-                train_size=train_size,
-            )
-        )
+        configuration_output_folder = output_folder
 
         configuration_results = (
             run_configuration_generation_analysis(

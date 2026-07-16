@@ -378,13 +378,27 @@ def run_monte_carlo_from_config(
     # Validate result values
     # =========================================================
 
-    trade_results = extract_trade_results(
+    trade_results_ticks = extract_trade_results(
         aggregated_trades=(
             aggregated_trades
         ),
         result_column=(
             config.result_column
         ),
+    )
+
+    trade_results = (trade_results_ticks * config.tick_value- config.commission)
+
+    aggregated_trades[
+        "result_ticks"
+    ] = trade_results_ticks
+
+    aggregated_trades[
+        "net_result"
+    ] = trade_results
+
+    results_manager.save_aggregated_trades(
+        dataframe=aggregated_trades
     )
 
     update_progress(
