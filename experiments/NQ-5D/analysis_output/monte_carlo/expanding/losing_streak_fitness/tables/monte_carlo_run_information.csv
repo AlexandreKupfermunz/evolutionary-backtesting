@@ -1,0 +1,2 @@
+walk_forward_type,fitness_function_name,train_size_name,configuration_folder,number_of_repetitions,selected_repetitions,number_of_source_files,number_of_trades,number_of_simulations,random_seed,result_column
+expanding,losing_streak_fitness,,experiments\NQ-5D\results\expanding\losing_streak_fitness,3,"rep_1, rep_2, rep_3",3,135,5000,42,result

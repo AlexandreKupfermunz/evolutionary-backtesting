@@ -1,0 +1,2 @@
+best_walk_forward_type,best_fitness_function,best_train_size,mean_test_fitness,mean_net_profit,mean_max_drawdown,mean_win_rate,mean_expectancy,mean_number_of_trades
+expanding,losing_streak_fitness,expanding,-198.65746004961923,2.5,106.91666666666667,0.2346239571097256,2.4426335050149093,11.25

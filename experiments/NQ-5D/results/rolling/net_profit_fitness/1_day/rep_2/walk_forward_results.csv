@@ -1,0 +1,5 @@
+window_id,train_start,train_end,test_start,test_end,min_impulse_candles,max_duration_ms,diagonal_imbalance_ratio_threshold,min_imbalance_count,take_profit_ticks,stop_loss_ticks,fitness,raw_test_fitness,test_fitness,test_fitness_multiplier,number_of_trades,net_profit,gross_profit,gross_loss,profit_factor,max_drawdown,win_rate,expectancy,biggest_loss,longest_losing_streak
+1,0,22406,22406,53560,8,2413,6.75,8,30,23,-620.0,-620.0,-620.0,1.0,5,-620.0,0.0,620.0,0.0,620.0,0.0,-124.0,124.0,5
+2,22406,53560,53560,86986,7,643,7.25,4,19,2,-217.0,-217.0,-217.0,1.0,23,-217.0,182.0,399.0,0.45614035087719296,380.0,0.08695652173913043,-9.434782608695652,19.0,20
+3,53560,86986,86986,125287,12,2096,3.75,5,27,2,222.0,222.0,222.0,1.0,12,222.0,393.0,171.0,2.2982456140350878,114.0,0.25,18.5,19.0,6
+4,86986,125287,125287,130699,7,2596,6.0,3,15,3,-72.0,-72.0,-72.0,1.0,3,-72.0,0.0,72.0,0.0,72.0,0.0,-24.0,24.0,3

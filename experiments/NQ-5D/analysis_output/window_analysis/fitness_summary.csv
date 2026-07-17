@@ -1,0 +1,3 @@
+fitness_function,mean_test_fitness,median_test_fitness,std_test_fitness,min_test_fitness,max_test_fitness,mean_net_profit,median_net_profit,mean_max_drawdown,median_max_drawdown,mean_win_rate,mean_expectancy,mean_number_of_trades,number_of_windows
+losing_streak_fitness,-292.3664384684384,-74.16719920220798,506.034524637028,-1000.0,360.1854522325964,-51.12820512820513,0.0,157.7948717948718,114.0,0.18217639841160033,-0.9750778940117417,10.538461538461538,39
+net_profit_fitness,-793.7692307692307,-217.0,1337.637970484156,-4000.0,381.0,-85.0,0.0,173.6153846153846,99.0,0.21074075498728134,-0.3814921910100519,6.794871794871795,39

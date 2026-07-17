@@ -1,0 +1,7 @@
+walk_forward_type,fitness_function,train_size,repetition,window_id,first_generation,last_generation,first_train_fitness,last_train_fitness,train_improvement,first_test_fitness,last_test_fitness,test_improvement,first_generalization_gap,last_generalization_gap,gap_change,number_of_generations_observed,overfit_flag
+rolling,net_profit_fitness,3_days,rep_1,1,0,100,222.0,336.0,114.0,-981.0,330.0,1311.0,1203.0,6.0,-1197.0,101,False
+rolling,net_profit_fitness,3_days,rep_1,2,0,100,157.0,561.0,404.0,-3000.0,-3000.0,0.0,3157.0,3561.0,404.0,101,True
+rolling,net_profit_fitness,3_days,rep_2,1,0,100,158.0,295.0,137.0,318.0,381.0,63.0,-160.0,-86.0,74.0,101,False
+rolling,net_profit_fitness,3_days,rep_2,2,0,100,360.0,673.0,313.0,-3000.0,-3000.0,0.0,3360.0,3673.0,313.0,101,True
+rolling,net_profit_fitness,3_days,rep_3,1,0,100,205.0,229.0,24.0,444.0,81.0,-363.0,-239.0,148.0,387.0,101,True
+rolling,net_profit_fitness,3_days,rep_3,2,0,100,228.0,673.0,445.0,-3000.0,-3000.0,0.0,3228.0,3673.0,445.0,101,True

@@ -1,0 +1,2 @@
+max_drawdown,net_profit,number_of_trades,win_rate,expectancy,gross_profit,gross_loss,profit_factor,recovery_factor,longest_losing_streak,simulation_id
+385.0,30.0,135,0.2740740740740741,0.2222222222222222,1892.0,1862.0,1.016111707841031,0.07792207792207792,14,

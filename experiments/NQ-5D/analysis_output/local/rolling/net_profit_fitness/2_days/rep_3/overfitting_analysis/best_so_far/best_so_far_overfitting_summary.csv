@@ -1,0 +1,4 @@
+window_id,first_generation,last_generation,first_train_fitness,last_train_fitness,train_improvement,first_test_fitness,last_test_fitness,test_improvement,first_generalization_gap,last_generalization_gap,gap_change,number_of_generations_observed,overfit_flag
+1,0.0,100.0,106.0,131.0,25.0,64.0,262.0,198.0,42.0,-131.0,-173.0,101,False
+2,0.0,100.0,197.0,355.0,158.0,208.0,-4.0,-212.0,-11.0,359.0,370.0,101,True
+3,0.0,100.0,104.0,520.0,416.0,-2000.0,-2000.0,0.0,2104.0,2520.0,416.0,101,True
